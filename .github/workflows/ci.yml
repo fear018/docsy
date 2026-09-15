@@ -13,10 +13,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Run gitleaks directly rather than through the marketplace action: the
+      # action scans a commit range, and on the first push the root commit has
+      # no parent, so the range is invalid and the job fails on a clean repo.
       - name: Scan for committed secrets
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --source /repo --redact --verbose --exit-code 1
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -28,4 +31,10 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
+
+      # The app validates its environment at boot, so the build needs real
+      # values. Both are public by design.
       - run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
