@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { NewBotForm } from './new-bot-form';
+import { BotRowActions } from './bot-row-actions';
 
 export const metadata: Metadata = { title: 'Bots — Docsy' };
 
@@ -46,18 +47,19 @@ export default async function BotsPage() {
         {bots.map((bot) => {
           const sources = bot.sources?.[0]?.count ?? 0;
           return (
-            <li key={bot.id}>
-              <Link
-                href={`/bots/${bot.id}/sources`}
-                className="border-line bg-surface hover:border-brand flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition"
-              >
+            <li
+              key={bot.id}
+              className="border-line bg-surface hover:border-brand flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 transition"
+            >
+              <Link href={`/bots/${bot.id}/sources`} className="min-w-0 flex-1">
                 <span className="font-medium">{bot.name}</span>
-                <span className="text-muted text-sm">
+                <span className="text-muted ml-3 text-sm">
                   {sources === 0
                     ? 'No sources yet'
                     : `${sources} source${sources === 1 ? '' : 's'}`}
                 </span>
               </Link>
+              <BotRowActions botId={bot.id} name={bot.name} />
             </li>
           );
         })}

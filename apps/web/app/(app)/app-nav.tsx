@@ -7,6 +7,9 @@ const LINKS = [
   { href: '/bots', label: 'Bots' },
   { href: '/billing', label: 'Plan' },
   { href: '/settings', label: 'Settings' },
+  // A page outside the app, but this is where someone stands when they wonder
+  // where to put the snippet.
+  { href: '/try', label: 'Try widget' },
 ] as const;
 
 export function AppNav() {
