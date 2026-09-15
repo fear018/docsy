@@ -1,7 +1,15 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import { MarketingNav } from './marketing-nav';
 
-export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
+  // Read on the server rather than in the browser: checking after hydration
+  // would show "Sign in" to someone already signed in and then swap it.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-dvh">
       <header className="border-line sticky top-0 z-10 border-b backdrop-blur-sm">
@@ -9,7 +17,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <Link href="/" className="text-sm font-semibold tracking-wide uppercase">
             Docsy
           </Link>
-          <MarketingNav />
+          <MarketingNav signedIn={Boolean(user)} />
         </div>
       </header>
 

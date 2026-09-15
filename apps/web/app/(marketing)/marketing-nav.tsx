@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export function MarketingNav() {
+export function MarketingNav({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   // The anchors only lead anywhere on the landing page itself.
   const onLanding = pathname === '/';
@@ -24,9 +24,19 @@ export function MarketingNav() {
           Home
         </Link>
       )}
-      <Link href="/login" className="font-medium">
-        Sign in
-      </Link>
+
+      {signedIn ? (
+        <Link
+          href="/bots"
+          className="bg-brand text-brand-fg rounded-lg px-3.5 py-1.5 font-medium transition hover:opacity-90"
+        >
+          Open app
+        </Link>
+      ) : (
+        <Link href="/login" className="font-medium">
+          Sign in
+        </Link>
+      )}
     </nav>
   );
 }
