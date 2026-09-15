@@ -62,7 +62,14 @@ const NO_ANSWER = 'I could not find that in the documentation';
 
 export async function answerQuestion(
   supabase: SupabaseClient<Database>,
-  args: { botId: string; question: string; history: Turn[]; tone: string },
+  args: {
+    botId: string;
+    question: string;
+    history: Turn[];
+    tone: string;
+    /** What this bot's documentation is about, for questions about itself. */
+    subject?: string | null;
+  },
 ): Promise<AnswerStream> {
   const standalone = await condense(args.question, args.history);
   const passages = await retrieve(supabase, args.botId, standalone);
@@ -73,7 +80,7 @@ export async function answerQuestion(
       content: `${SYSTEM_PROMPT}\n\nOnly when the passages are about something else entirely, begin your reply with exactly: "${NO_ANSWER}". Do not use that sentence when the passages are relevant but incomplete.`,
     },
     ...args.history.slice(-HISTORY_TURNS),
-    { role: 'user', content: buildUserMessage(args.question, passages, args.tone) },
+    { role: 'user', content: buildUserMessage(args.question, passages, args.tone, args.subject) },
   ];
 
   const completion = await openai().chat.completions.create({

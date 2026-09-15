@@ -46,7 +46,7 @@ export async function POST(
   // RLS turns another owner's bot into no rows, so this is the access check.
   const { data: bot } = await supabase
     .from('bots')
-    .select('id, tone')
+    .select('id, tone, name')
     .eq('id', botId)
     .maybeSingle();
   if (!bot) return NextResponse.json({ error: 'That bot does not exist.' }, { status: 404 });
@@ -92,6 +92,7 @@ export async function POST(
       question: parsed.data.question,
       history,
       tone: bot.tone,
+      subject: bot.name,
     });
 
     const body = new ReadableStream<Uint8Array>({

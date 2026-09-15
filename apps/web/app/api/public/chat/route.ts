@@ -156,6 +156,9 @@ export async function POST(request: NextRequest) {
       question,
       history,
       tone: bot.tone,
+      // The widget's own title is what the visitor already sees above the
+      // chat, so it is the truest description of what this bot is for.
+      subject: (bot.widget_config as { title?: string } | null)?.title ?? null,
     });
 
     const body = new ReadableStream<Uint8Array>({

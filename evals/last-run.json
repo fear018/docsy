@@ -1,7 +1,7 @@
 {
-  "at": "2026-09-15T12:25:11.805Z",
-  "passed": 30,
-  "total": 30,
+  "at": "2026-09-15T18:41:13.830Z",
+  "passed": 29,
+  "total": 33,
   "outcomes": [
     {
       "question": "What is a connection pooler?",
@@ -9,7 +9,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1771,
+      "latencyMs": 2619,
       "detail": ""
     },
     {
@@ -18,7 +18,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1850,
+      "latencyMs": 2213,
       "detail": ""
     },
     {
@@ -27,17 +27,17 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1811,
+      "latencyMs": 1704,
       "detail": ""
     },
     {
       "question": "What is pgbouncer used for?",
-      "ok": true,
-      "answeredOk": true,
-      "mentionsOk": true,
+      "ok": false,
+      "answeredOk": false,
+      "mentionsOk": false,
       "sourceOk": true,
-      "latencyMs": 1581,
-      "detail": ""
+      "latencyMs": 1281,
+      "detail": "expected an answer; missing terms"
     },
     {
       "question": "How do I connect to Postgres from a serverless function?",
@@ -45,7 +45,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 2347,
+      "latencyMs": 1793,
       "detail": ""
     },
     {
@@ -54,7 +54,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1747,
+      "latencyMs": 1946,
       "detail": ""
     },
     {
@@ -63,7 +63,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1670,
+      "latencyMs": 2189,
       "detail": ""
     },
     {
@@ -72,7 +72,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 2662,
+      "latencyMs": 3064,
       "detail": ""
     },
     {
@@ -81,7 +81,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1589,
+      "latencyMs": 1852,
       "detail": ""
     },
     {
@@ -90,7 +90,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1950,
+      "latencyMs": 1989,
       "detail": ""
     },
     {
@@ -99,7 +99,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1603,
+      "latencyMs": 2015,
       "detail": ""
     },
     {
@@ -108,7 +108,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 4237,
+      "latencyMs": 2226,
       "detail": ""
     },
     {
@@ -117,7 +117,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1648,
+      "latencyMs": 3144,
       "detail": ""
     },
     {
@@ -126,7 +126,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1603,
+      "latencyMs": 2436,
       "detail": ""
     },
     {
@@ -135,7 +135,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1463,
+      "latencyMs": 1828,
       "detail": ""
     },
     {
@@ -144,7 +144,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1802,
+      "latencyMs": 1963,
       "detail": ""
     },
     {
@@ -153,7 +153,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1395,
+      "latencyMs": 1885,
       "detail": ""
     },
     {
@@ -162,7 +162,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1497,
+      "latencyMs": 1414,
       "detail": ""
     },
     {
@@ -171,7 +171,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 2311,
+      "latencyMs": 2356,
       "detail": ""
     },
     {
@@ -180,26 +180,26 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1944,
+      "latencyMs": 1776,
       "detail": ""
     },
     {
       "question": "What is database replication?",
-      "ok": true,
-      "answeredOk": true,
-      "mentionsOk": true,
-      "sourceOk": true,
-      "latencyMs": 1204,
-      "detail": ""
+      "ok": false,
+      "answeredOk": false,
+      "mentionsOk": false,
+      "sourceOk": false,
+      "latencyMs": 1321,
+      "detail": "expected an answer; missing terms; no citation matching \"replication\""
     },
     {
       "question": "How do I use Drizzle with Supabase?",
-      "ok": true,
+      "ok": false,
       "answeredOk": true,
       "mentionsOk": true,
-      "sourceOk": true,
-      "latencyMs": 1946,
-      "detail": ""
+      "sourceOk": false,
+      "latencyMs": 2408,
+      "detail": "no citation matching \"Drizzle\""
     },
     {
       "question": "What is OrioleDB?",
@@ -207,7 +207,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1599,
+      "latencyMs": 1980,
       "detail": ""
     },
     {
@@ -216,17 +216,17 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1596,
+      "latencyMs": 1945,
       "detail": ""
     },
     {
       "question": "Is there a way to connect Metabase?",
-      "ok": true,
-      "answeredOk": true,
-      "mentionsOk": true,
-      "sourceOk": true,
-      "latencyMs": 1514,
-      "detail": ""
+      "ok": false,
+      "answeredOk": false,
+      "mentionsOk": false,
+      "sourceOk": false,
+      "latencyMs": 1415,
+      "detail": "expected an answer; missing terms; no citation matching \"Metabase\""
     },
     {
       "question": "What is the airspeed velocity of an unladen swallow?",
@@ -234,7 +234,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1276,
+      "latencyMs": 1338,
       "detail": ""
     },
     {
@@ -243,7 +243,7 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1271,
+      "latencyMs": 1187,
       "detail": ""
     },
     {
@@ -252,16 +252,16 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1361,
+      "latencyMs": 1351,
       "detail": ""
     },
     {
-      "question": "What is your pricing for the enterprise plan?",
+      "question": "What was the closing price of Apple stock yesterday?",
       "ok": true,
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1147,
+      "latencyMs": 1518,
       "detail": ""
     },
     {
@@ -270,7 +270,34 @@
       "answeredOk": true,
       "mentionsOk": true,
       "sourceOk": true,
-      "latencyMs": 1279,
+      "latencyMs": 1681,
+      "detail": ""
+    },
+    {
+      "question": "what is this documentation about?",
+      "ok": true,
+      "answeredOk": true,
+      "mentionsOk": true,
+      "sourceOk": true,
+      "latencyMs": 1593,
+      "detail": ""
+    },
+    {
+      "question": "who are you?",
+      "ok": true,
+      "answeredOk": true,
+      "mentionsOk": true,
+      "sourceOk": true,
+      "latencyMs": 2196,
+      "detail": ""
+    },
+    {
+      "question": "what can you help me with?",
+      "ok": true,
+      "answeredOk": true,
+      "mentionsOk": true,
+      "sourceOk": true,
+      "latencyMs": 1682,
       "detail": ""
     }
   ]

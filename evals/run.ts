@@ -55,10 +55,12 @@ async function main() {
   const save = process.argv.includes('--save');
   const spec = JSON.parse(await readFile(join(here, 'questions.json'), 'utf8')) as {
     questions: Question[];
+    bot?: { name: string };
   };
 
   const supabase = createServiceClient();
-  const wanted = process.env.DOCSY_EVAL_BOT;
+  // The set names the bot it was written against; DOCSY_EVAL_BOT overrides it.
+  const wanted = process.env.DOCSY_EVAL_BOT ?? spec.bot?.name;
   const query = supabase.from('bots').select('id, name, tone').limit(1);
   const { data: bot } = await (wanted ? query.eq('name', wanted) : query).maybeSingle();
 
@@ -83,6 +85,9 @@ async function main() {
       question: question.q,
       history: [],
       tone: bot.tone,
+      // Production passes this, so the set has to as well — otherwise it is
+      // measuring a configuration nobody runs.
+      subject: bot.name,
     });
 
     for await (const _ of stream) {
