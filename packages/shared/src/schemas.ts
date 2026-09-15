@@ -61,3 +61,26 @@ export const addTextSourceSchema = z.object({
 export const sourceIdSchema = z.object({
   sourceId: z.uuid(),
 });
+
+/** A CSS colour we are willing to inject into the widget's styles. */
+const hexColour = z
+  .string()
+  .trim()
+  .regex(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i, 'Use a hex colour such as #3b6fd4.');
+
+export const widgetConfigSchema = z.object({
+  botId: z.uuid(),
+  title: z.string().trim().min(1, 'Give the widget a title.').max(40),
+  greeting: z.string().trim().max(200).optional().or(z.literal('')),
+  accent: hexColour,
+  position: z.enum(['right', 'left']),
+  /** Up to four one-tap questions shown before the visitor types. */
+  starters: z.array(z.string().trim().max(80)).max(4).default([]),
+  /**
+   * Domains the widget may run on. Empty means unrestricted, which is the
+   * honest default before the owner has installed it anywhere.
+   */
+  allowedOrigins: z.array(z.string().trim().max(200)).max(20).default([]),
+});
+
+export type WidgetConfigInput = z.infer<typeof widgetConfigSchema>;
