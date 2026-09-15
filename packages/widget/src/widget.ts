@@ -66,31 +66,66 @@ function build(options: Options) {
   } satisfies Styles);
   launcher.textContent = '?';
 
+  /**
+   * The frame paints white until its document loads, which flashes against a
+   * dark page and looks like something broke. A panel in the widget's own
+   * colour sits underneath and says what is happening; the frame is
+   * transparent until it has something to show, then covers it.
+   */
+  const shell = document.createElement('div');
+  const loading = document.createElement('div');
+
   const frame = document.createElement('iframe');
   frame.title = options.label;
   frame.setAttribute('loading', 'lazy');
   // The frame only needs to run its own scripts and talk to its own origin.
   frame.setAttribute('allow', 'clipboard-write');
-  Object.assign(frame.style, {
+  Object.assign(shell.style, {
     position: 'fixed',
     bottom: '84px',
     [side]: '20px',
     zIndex: '2147483000',
     width: 'min(400px, calc(100vw - 40px))',
     height: 'min(620px, calc(100vh - 120px))',
-    border: '0',
     borderRadius: '14px',
-    background: '#fff',
+    overflow: 'hidden',
+    background: options.accent,
     boxShadow: '0 12px 48px rgba(0,0,0,.24)',
     display: 'none',
+  } satisfies Styles);
+
+  Object.assign(loading.style, {
+    position: 'absolute',
+    inset: '0',
+    display: 'grid',
+    placeItems: 'center',
+    color: '#fff',
+    font: '500 13px/1 system-ui, sans-serif',
+    opacity: '.9',
+  } satisfies Styles);
+  loading.textContent = 'Loading…';
+
+  Object.assign(frame.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    border: '0',
+    background: 'transparent',
     colorScheme: 'light dark',
   } satisfies Styles);
+
+  frame.addEventListener('load', () => {
+    loading.remove();
+    // Only now is there something to show; before this the frame is empty.
+    frame.style.background = '';
+  });
 
   // Phones: a 400px panel floating over a 390px screen is unusable.
   const phone = matchMedia('(max-width: 480px)');
   const applySize = () => {
     if (phone.matches) {
-      Object.assign(frame.style, {
+      Object.assign(shell.style, {
         inset: '0',
         width: '100%',
         height: '100%',
@@ -113,7 +148,7 @@ function build(options: Options) {
       frame.src = url.toString();
       loaded = true;
     }
-    frame.style.display = open ? 'block' : 'none';
+    shell.style.display = open ? 'block' : 'none';
     launcher.setAttribute('aria-expanded', String(open));
     launcher.textContent = open ? '×' : '?';
     if (open) frame.focus();
@@ -136,7 +171,8 @@ function build(options: Options) {
     }
   });
 
-  document.body.append(frame, launcher);
+  shell.append(loading, frame);
+  document.body.append(shell, launcher);
 
   return {
     open: () => setOpen(true),

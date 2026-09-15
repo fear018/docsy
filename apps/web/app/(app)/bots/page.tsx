@@ -49,9 +49,9 @@ export default async function BotsPage() {
           return (
             <li
               key={bot.id}
-              className="border-line bg-surface hover:border-brand flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 transition"
+              className="border-line bg-surface hover:border-brand flex items-center gap-3 rounded-lg border px-4 py-3 transition"
             >
-              <Link href={`/bots/${bot.id}/sources`} className="min-w-0 flex-1">
+              <Link href={`/bots/${bot.id}/sources`} className="min-w-0 flex-1 truncate">
                 <span className="font-medium">{bot.name}</span>
                 <span className="text-muted ml-3 text-sm">
                   {sources === 0
