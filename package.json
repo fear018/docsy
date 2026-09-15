@@ -24,7 +24,8 @@
     "db:test:rls": "docker exec -i supabase_db_docsy psql -U postgres -d postgres -v ON_ERROR_STOP=1 -t -A -f - < supabase/tests/rls.sql",
     "db:push": "set -a && . ./apps/web/.env.local && set +a && supabase db push --db-url \"$SUPABASE_DB_URL\"",
     "test": "turbo run test",
-    "demo:site": "npx --yes serve demo-site -p 4000"
+    "demo:site": "npx --yes serve demo-site -p 4000",
+    "launch:check": "node scripts/launch-check.mjs"
   },
   "devDependencies": {
     "husky": "^9.1.7",
