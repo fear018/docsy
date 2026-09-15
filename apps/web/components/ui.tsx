@@ -2,8 +2,9 @@
 
 import { useFormStatus } from 'react-dom';
 
-const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition disabled:opacity-60';
+import { CONTROL_HEIGHT } from './field';
+
+const BASE = `inline-flex ${CONTROL_HEIGHT} items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium transition disabled:opacity-60`;
 
 const VARIANTS = {
   primary: 'bg-brand text-brand-fg hover:opacity-90',

@@ -16,8 +16,16 @@ import type { z } from 'zod';
  * correct and useless.
  */
 
+/**
+ * Controls share an explicit height rather than matching padding by eye.
+ * A button and an input with the same padding still differ once borders and
+ * line-height are counted, and the mismatch only shows up when they sit side
+ * by side — which is most of the forms here.
+ */
+export const CONTROL_HEIGHT = 'h-10';
+
 const BASE =
-  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none';
+  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-3 text-sm outline-none';
 
 export interface FieldProps extends Omit<React.ComponentProps<'input'>, 'id' | 'className'> {
   name: string;
@@ -71,7 +79,7 @@ export function Field({
     defaultValue,
     'aria-invalid': shown ? (true as const) : undefined,
     'aria-describedby': describedBy || undefined,
-    className: `${BASE} ${shown ? 'border-red-500' : ''} ${className}`,
+    className: `${BASE} ${multiline ? 'py-2' : CONTROL_HEIGHT} ${shown ? 'border-red-500' : ''} ${className}`,
     onBlur: (event: React.FocusEvent<HTMLInputElement & HTMLTextAreaElement>) => {
       setTouched(true);
       check(event.target.value);

@@ -224,12 +224,12 @@ export function WidgetChat({
             onChange={(event) => setQuestion(event.target.value)}
             disabled={busy}
             placeholder="Ask a question…"
-            className="border-line focus:border-brand min-w-0 flex-1 rounded-lg border bg-transparent px-3 py-2 text-sm outline-none disabled:opacity-60"
+            className="border-line focus:border-brand h-10 min-w-0 flex-1 rounded-lg border bg-transparent px-3 text-sm outline-none disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={busy || !question.trim()}
-            className="bg-brand text-brand-fg rounded-lg px-3.5 py-2 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+            className="bg-brand text-brand-fg h-10 rounded-lg px-3.5 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
           >
             {busy ? '…' : 'Ask'}
           </button>

@@ -20,7 +20,7 @@ const KINDS: { id: Kind; label: string; hint: string }[] = [
 ];
 
 const INPUT =
-  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm outline-none';
+  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-4.5 text-sm outline-none h-10';
 
 export function AddSource({ botId }: { botId: string }) {
   const [kind, setKind] = useState<Kind>('url');

@@ -183,12 +183,12 @@ export function DemoChat({ publicKey }: { publicKey: string | null }) {
           onChange={(event) => setQuestion(event.target.value)}
           disabled={busy}
           placeholder="Or ask your own question…"
-          className="border-line focus:border-brand bg-bg min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm outline-none disabled:opacity-60"
+          className="border-line focus:border-brand bg-bg h-10 min-w-0 flex-1 rounded-lg border px-3 text-sm outline-none disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={busy || !question.trim()}
-          className="bg-brand text-brand-fg rounded-lg px-4 py-2 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+          className="bg-brand text-brand-fg h-10 rounded-lg px-4 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
         >
           {busy ? '…' : 'Ask'}
         </button>

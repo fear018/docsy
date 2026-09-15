@@ -21,7 +21,7 @@ export interface WidgetForm {
 }
 
 const INPUT =
-  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none';
+  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-3 text-sm outline-none h-10';
 
 export function WidgetSettings(props: WidgetForm) {
   const [state, action] = useActionState<WidgetState, FormData>(saveWidgetConfig, {});
