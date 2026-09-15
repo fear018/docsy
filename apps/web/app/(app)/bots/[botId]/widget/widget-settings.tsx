@@ -260,6 +260,18 @@ export function WidgetSettings(props: WidgetForm) {
           <pre className="border-line bg-surface mt-2 overflow-x-auto rounded-lg border p-3 text-[11px] leading-relaxed">
             {snippet}
           </pre>
+          <p className="text-muted mt-2 text-sm">
+            No site to try it on yet?{' '}
+            <a
+              href="/try"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              Load it on our test page
+            </a>
+            .
+          </p>
           <button
             type="button"
             onClick={copy}

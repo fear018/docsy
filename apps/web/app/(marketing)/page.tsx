@@ -136,6 +136,13 @@ export default async function LandingPage() {
         <pre className="border-line bg-surface mt-8 overflow-x-auto rounded-lg border p-4 text-[13px]">
           {`<script src="${publicEnv.NEXT_PUBLIC_APP_URL}/widget.js" data-bot="pk_…" defer></script>`}
         </pre>
+        <p className="text-muted mt-3 text-sm">
+          No site to paste it into?{' '}
+          <Link href="/try" className="underline underline-offset-2">
+            Load it on our test page
+          </Link>{' '}
+          and see it run somewhere that is not ours either.
+        </p>
       </Section>
 
       <Section className="border-line border-t py-14">
