@@ -104,6 +104,18 @@ await check('an unknown widget key reveals nothing', async () => {
   return `404 with a neutral message`;
 });
 
+await check('no snippet points at localhost', async () => {
+  // NEXT_PUBLIC_* are inlined at build time. A platform that hides a variable
+  // from the build — Vercel does this for anything marked sensitive — leaves
+  // the code falling back to its development default, and the install snippet
+  // quietly tells every customer to load the widget from their own machine.
+  const html = await (await fetch(base + '/')).text();
+  if (/localhost|127\.0\.0\.1/.test(html)) {
+    throw new Error('the page contains a localhost URL');
+  }
+  return 'landing has no localhost URL';
+});
+
 for (const { ok, label, detail } of results) {
   console.log(`${ok ? '  ok  ' : '  FAIL'} ${label}${detail ? ` — ${detail}` : ''}`);
 }
