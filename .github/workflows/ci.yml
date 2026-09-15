@@ -31,6 +31,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm test
 
       # The app validates its environment at boot, so the build needs real
       # values. Both are public by design.

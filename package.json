@@ -22,7 +22,8 @@
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
     "prepare": "husky",
     "db:test:rls": "docker exec -i supabase_db_docsy psql -U postgres -d postgres -v ON_ERROR_STOP=1 -t -A -f - < supabase/tests/rls.sql",
-    "db:push": "set -a && . ./apps/web/.env.local && set +a && supabase db push --db-url \"$SUPABASE_DB_URL\""
+    "db:push": "set -a && . ./apps/web/.env.local && set +a && supabase db push --db-url \"$SUPABASE_DB_URL\"",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "husky": "^9.1.7",
