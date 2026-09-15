@@ -16,11 +16,12 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:migrate": "supabase migration up",
-    "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts",
+    "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts && prettier --write packages/shared/src/database.types.ts",
     "widget:build": "pnpm --filter @docsy/widget build",
     "eval": "pnpm --filter @docsy/web eval",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:test:rls": "docker exec -i supabase_db_docsy psql -U postgres -d postgres -v ON_ERROR_STOP=1 -t -A -f - < supabase/tests/rls.sql"
   },
   "devDependencies": {
     "husky": "^9.1.7",
