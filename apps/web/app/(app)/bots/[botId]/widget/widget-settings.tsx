@@ -174,6 +174,10 @@ export function WidgetSettings(props: WidgetForm) {
             One per line. Subdomains are covered automatically. Leave empty to allow any site — fine
             while you are testing, worth filling in once you install it.
           </p>
+          <p className="text-muted text-sm">
+            A page opened straight from your disk reports no address at all, so it only works while
+            this list is empty.
+          </p>
           <label htmlFor="allowedOrigins" className="sr-only">
             Allowed domains
           </label>

@@ -80,6 +80,11 @@
         The button below calls <code>window.Docsy.open()</code>, the same API a customer would wire
         to their own help link.
       </p>
+      <p>
+        Note: opened straight from disk this page has no address of its own, so the bot's
+        allowed-domains list must be empty for it to answer. Serving it over
+        <code>http://localhost</code> reports an address like any other site.
+      </p>
       <button type="button" onclick="window.Docsy &amp;&amp; window.Docsy.open()">
         Open the assistant
       </button>
@@ -87,10 +92,10 @@
 
     <!-- Replace data-bot with a real key, and the src host when testing against production. -->
     <script
-      src="http://localhost:3000/widget.js"
-      data-bot="REPLACE_WITH_PUBLIC_KEY"
-      data-label="Ask Acme docs"
-      data-accent="#f4c95d"
+      src="https://docsy-web-ivory.vercel.app/widget.js"
+      data-bot="pk_239b458aa87ffb4a33428901f5834da7"
+      data-label="Ask Supabase docs"
+      data-accent="#3b6fd4"
       defer
     ></script>
   </body>
