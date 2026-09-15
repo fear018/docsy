@@ -1,0 +1,187 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { Answer, type CitationRef } from '@/components/answer';
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  citations: CitationRef[];
+  streaming?: boolean;
+}
+
+const SUGGESTIONS = ['What does this product do?', 'How do I get started?', 'What are the limits?'];
+
+export function Chat({ botId, hasSources }: { botId: string; hasSources: boolean }) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [question, setQuestion] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const conversationId = useRef<string | null>(null);
+  const bottom = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages]);
+
+  async function ask(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed || busy) return;
+
+    setError(null);
+    setBusy(true);
+    setQuestion('');
+
+    const answerId = crypto.randomUUID();
+    setMessages((current) => [
+      ...current,
+      { id: crypto.randomUUID(), role: 'user', content: trimmed, citations: [] },
+      { id: answerId, role: 'assistant', content: '', citations: [], streaming: true },
+    ]);
+
+    const update = (patch: Partial<Message>) =>
+      setMessages((current) =>
+        current.map((message) => (message.id === answerId ? { ...message, ...patch } : message)),
+      );
+
+    try {
+      const response = await fetch(`/api/bots/${botId}/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ question: trimmed, conversationId: conversationId.current }),
+      });
+
+      if (!response.ok || !response.body) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error ?? 'We could not answer that right now.');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let text = '';
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // Newline-delimited JSON: keep the trailing partial line for next read.
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const raw of lines) {
+          if (!raw.trim()) continue;
+          const event = JSON.parse(raw);
+          if (event.type === 'start') conversationId.current = event.conversationId;
+          else if (event.type === 'delta') {
+            text += event.text;
+            update({ content: text });
+          } else if (event.type === 'done') {
+            update({ citations: event.citations, streaming: false });
+          } else if (event.type === 'error') {
+            throw new Error(event.message);
+          }
+        }
+      }
+
+      update({ streaming: false });
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Something went wrong.');
+      setMessages((current) => current.filter((message) => message.id !== answerId));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!hasSources) {
+    return (
+      <div className="border-line rounded-lg border border-dashed p-10 text-center">
+        <p className="font-medium">Nothing to answer from yet</p>
+        <p className="text-muted mx-auto mt-2 max-w-sm text-sm">
+          Add a source first. Once a page is indexed, you can ask about it here exactly as your
+          visitors will.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-[28rem] flex-col">
+      <div className="flex-1 space-y-6">
+        {messages.length === 0 && (
+          <div className="text-muted text-sm">
+            <p>Ask anything your documentation covers. Answers cite the section they came from.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => ask(suggestion)}
+                  className="border-line hover:border-brand rounded-full border px-3 py-1.5 text-sm transition"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {messages.map((message) =>
+          message.role === 'user' ? (
+            <div key={message.id} className="flex justify-end">
+              <p className="bg-surface border-line max-w-[85%] rounded-2xl rounded-br-md border px-4 py-2.5 text-[15px]">
+                {message.content}
+              </p>
+            </div>
+          ) : (
+            <div key={message.id}>
+              {message.content ? (
+                <Answer text={message.content} citations={message.citations} />
+              ) : (
+                <p className="text-muted text-sm" role="status">
+                  Searching the documentation…
+                </p>
+              )}
+            </div>
+          ),
+        )}
+
+        {error && (
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
+        <div ref={bottom} />
+      </div>
+
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void ask(question);
+        }}
+        className="bg-bg sticky bottom-0 mt-6 flex gap-2 py-3"
+      >
+        <label htmlFor="question" className="sr-only">
+          Your question
+        </label>
+        <input
+          id="question"
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+          disabled={busy}
+          placeholder="Ask about your documentation…"
+          className="border-line focus:border-brand flex-1 rounded-lg border bg-transparent px-4 py-2.5 text-sm outline-none disabled:opacity-60"
+        />
+        <button
+          type="submit"
+          disabled={busy || !question.trim()}
+          className="bg-brand text-brand-fg rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+        >
+          {busy ? 'Thinking…' : 'Ask'}
+        </button>
+      </form>
+    </div>
+  );
+}
