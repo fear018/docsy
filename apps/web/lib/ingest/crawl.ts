@@ -101,8 +101,14 @@ export function parseSitemap(xml: string): { pages: string[]; nested: string[] }
   const pages: string[] = [];
   const nested: string[] = [];
 
-  $('sitemapindex > sitemap > loc').each((_, el) => nested.push($(el).text().trim()));
-  $('urlset > url > loc').each((_, el) => pages.push($(el).text().trim()));
+  // Braces on purpose: cheerio's each() types the return as boolean | void, and
+  // an expression body would return push()'s number.
+  $('sitemapindex > sitemap > loc').each((_, el) => {
+    nested.push($(el).text().trim());
+  });
+  $('urlset > url > loc').each((_, el) => {
+    pages.push($(el).text().trim());
+  });
 
   return { pages, nested };
 }
