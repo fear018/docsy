@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PLAN_IDS, PLANS } from '@docsy/shared';
 import { publicEnv } from '@/lib/env';
+import { createClient } from '@/lib/supabase/server';
 import { DemoChat } from './demo-chat';
 
 export const metadata: Metadata = {
@@ -66,7 +67,22 @@ function Section({
   );
 }
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  /**
+   * Carries the chosen plan all the way to checkout.
+   *
+   * Sending everyone to /login lost it twice over: someone already signed in
+   * was bounced straight to their bots, and someone signing up arrived with no
+   * memory of which plan they had picked.
+   */
+  const choosePlan = (plan: string) =>
+    user ? `/billing?plan=${plan}` : `/login?next=${encodeURIComponent(`/billing?plan=${plan}`)}`;
+
   return (
     <main className="pb-24">
       <Section className="pt-16 pb-14 sm:pt-24">
@@ -81,12 +97,14 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/login"
+                href={user ? '/bots' : '/login'}
                 className="bg-brand text-brand-fg rounded-lg px-5 py-2.5 text-sm font-medium transition hover:opacity-90"
               >
-                Start free
+                {user ? 'Open your bots' : 'Start free'}
               </Link>
-              <span className="text-muted text-sm">No card. 50 pages on the free plan.</span>
+              <span className="text-muted text-sm">
+                {user ? 'Pick up where you left off.' : 'No card. 50 pages on the free plan.'}
+              </span>
             </div>
             <p className="text-muted mt-6 text-sm">
               Built for SaaS and dev-tools teams whose documentation already answers most support
@@ -257,10 +275,10 @@ export default function LandingPage() {
             good. That is the only question worth asking first.
           </p>
           <Link
-            href="/login"
+            href={user ? '/bots' : '/login'}
             className="bg-brand text-brand-fg mt-6 inline-block rounded-lg px-5 py-2.5 text-sm font-medium transition hover:opacity-90"
           >
-            Start free
+            {user ? 'Open your bots' : 'Start free'}
           </Link>
         </div>
       </Section>

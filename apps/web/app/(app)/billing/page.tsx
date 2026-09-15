@@ -30,9 +30,9 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
 export default async function BillingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ upgraded?: string; portal?: string }>;
+  searchParams: Promise<{ upgraded?: string; portal?: string; plan?: string }>;
 }) {
-  const { upgraded, portal } = await searchParams;
+  const { upgraded, portal, plan: wantedPlan } = await searchParams;
   const supabase = await createClient();
   const usage = await getUsage(supabase);
   const { data: subscription } = await supabase
@@ -100,7 +100,11 @@ export default async function BillingPage({
       <section>
         <h2 className="font-medium">Plans</h2>
         {isBillingConfigured() ? (
-          <PlanCards current={usage.plan.id} plans={PLAN_IDS.map((id) => PLANS[id])} />
+          <PlanCards
+            current={usage.plan.id}
+            plans={PLAN_IDS.map((id) => PLANS[id])}
+            wanted={wantedPlan ?? null}
+          />
         ) : (
           <p className="text-muted mt-3 text-sm">Checkout is not configured in this environment.</p>
         )}

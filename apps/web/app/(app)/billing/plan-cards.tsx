@@ -5,7 +5,16 @@ import type { Plan, PlanId } from '@docsy/shared';
 import { startCheckout, openPortal, type BillingState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
 
-export function PlanCards({ current, plans }: { current: PlanId; plans: Plan[] }) {
+export function PlanCards({
+  current,
+  plans,
+  wanted,
+}: {
+  current: PlanId;
+  plans: Plan[];
+  /** The plan chosen on the landing page, carried through sign-in. */
+  wanted?: string | null;
+}) {
   const [state, action] = useActionState<BillingState, FormData>(startCheckout, {});
 
   return (
@@ -13,14 +22,20 @@ export function PlanCards({ current, plans }: { current: PlanId; plans: Plan[] }
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         {plans.map((plan) => {
           const isCurrent = plan.id === current;
+          const isWanted = plan.id === wanted && !isCurrent;
           return (
             <div
               key={plan.id}
-              className={`border-line rounded-lg border p-4 ${isCurrent ? 'border-brand' : ''}`}
+              className={`border-line rounded-lg border p-4 ${
+                isCurrent || isWanted ? 'border-brand' : ''
+              } ${isWanted ? 'ring-brand/30 ring-2' : ''}`}
             >
               <div className="flex items-baseline justify-between">
                 <p className="font-semibold">{plan.name}</p>
                 {isCurrent && <span className="text-brand text-xs font-medium">Current</span>}
+                {isWanted && (
+                  <span className="text-brand text-xs font-medium">You picked this</span>
+                )}
               </div>
               <p className="mt-1 text-2xl font-semibold">
                 ${plan.price}
