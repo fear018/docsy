@@ -111,14 +111,20 @@ function build(options: Options) {
     width: '100%',
     height: '100%',
     border: '0',
-    background: 'transparent',
+    // Hidden, not transparent. An iframe with no src shows about:blank, and
+    // that document paints itself white however the element is styled — which
+    // is the flash this is here to prevent, and it would cover the panel
+    // underneath.
+    opacity: '0',
+    transition: 'opacity .15s ease',
     colorScheme: 'light dark',
   } satisfies Styles);
 
   frame.addEventListener('load', () => {
+    // about:blank fires load too, before there is anything to show.
+    if (!frame.src) return;
+    frame.style.opacity = '1';
     loading.remove();
-    // Only now is there something to show; before this the frame is empty.
-    frame.style.background = '';
   });
 
   // Phones: a 400px panel floating over a 390px screen is unusable.
