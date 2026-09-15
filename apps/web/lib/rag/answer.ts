@@ -70,7 +70,7 @@ export async function answerQuestion(
   const messages: OpenAI.ChatCompletionMessageParam[] = [
     {
       role: 'system',
-      content: `${SYSTEM_PROMPT}\n\nWhen the passages do not answer the question, begin your reply with exactly: "${NO_ANSWER}".`,
+      content: `${SYSTEM_PROMPT}\n\nOnly when the passages are about something else entirely, begin your reply with exactly: "${NO_ANSWER}". Do not use that sentence when the passages are relevant but incomplete.`,
     },
     ...args.history.slice(-HISTORY_TURNS),
     { role: 'user', content: buildUserMessage(args.question, passages, args.tone) },

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    // The runner imports the app's modules, which use the @/ alias.
+    "baseUrl": "..",
+    "paths": { "@/*": ["apps/web/*"] }
+  },
+  "include": ["*.ts"]
+}
