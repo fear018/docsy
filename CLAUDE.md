@@ -28,6 +28,9 @@ demo-site/        static page to test the widget on a foreign origin
 - Env lives in `apps/web/.env.local` — Next only reads it from its own directory, not the
   monorepo root. Root scripts that need it source it from there.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only. It must never reach a client bundle.
+- Sign-in keeps both Google and magic link. Google is primary; the email link exists so a
+  reviewer unwilling to authorise a Google app — or hitting a broken OAuth config — can
+  still get in. Do not remove it to simplify the screen.
 - Plan limits live in `packages/shared/src/plans.ts` — one source of truth, never inline a limit.
 - Quota is checked **before** calling the model, never after.
 - All external input is parsed with a zod schema from `packages/shared`.
