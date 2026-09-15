@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { getUsage } from '@/lib/billing/usage';
 
 export const metadata: Metadata = { title: 'Settings — Docsy' };
 
@@ -8,6 +10,8 @@ export default async function SettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const usage = await getUsage(supabase);
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -29,11 +33,14 @@ export default async function SettingsPage() {
         </div>
         <div className="flex justify-between gap-4 px-4 py-3 text-sm">
           <dt className="text-muted">Plan</dt>
-          <dd>Free</dd>
+          <dd>
+            {usage.plan.name}
+            <Link href="/billing" className="text-brand ml-2 underline-offset-2 hover:underline">
+              Change
+            </Link>
+          </dd>
         </div>
       </dl>
-
-      <p className="text-muted mt-4 text-sm">Billing and plan changes arrive in R4.</p>
     </div>
   );
 }

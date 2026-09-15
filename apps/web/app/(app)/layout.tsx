@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getEntitlements } from '@/lib/billing/entitlements';
 import { UsageBanner } from '@/components/usage-banner';
+import { AppNav } from './app-nav';
 import { signOut } from '../(auth)/login/actions';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,17 +25,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/bots" className="text-sm font-semibold tracking-wide uppercase">
             Docsy
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/bots" className="text-muted hover:text-fg transition">
-              Bots
-            </Link>
-            <Link href="/billing" className="text-muted hover:text-fg transition">
-              Plan
-            </Link>
-            <Link href="/settings" className="text-muted hover:text-fg transition">
-              Settings
-            </Link>
-          </nav>
+          <AppNav />
           <form action={signOut} className="ml-auto">
             <button type="submit" className="text-muted hover:text-fg text-sm transition">
               Sign out
