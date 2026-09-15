@@ -1,27 +1,26 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { botNameSchema } from '@docsy/shared';
 import { renameBot, deleteBot, type ActionState } from '../../actions';
 import { FieldError, SubmitButton } from '@/components/ui';
+import { Field } from '@/components/field';
 
 export function RenameBotForm({ botId, name }: { botId: string; name: string }) {
   const [state, action] = useActionState<ActionState, FormData>(renameBot, {});
 
   return (
-    <form action={action} className="mt-3 flex flex-wrap items-start gap-2">
+    <form action={action} noValidate className="mt-3 flex flex-wrap items-start gap-2">
       <input type="hidden" name="botId" value={botId} />
       <div>
-        <label htmlFor="rename" className="sr-only">
-          Bot name
-        </label>
-        <input
-          id="rename"
+        <Field
           name="name"
+          label="Bot name"
+          hideLabel
           defaultValue={name}
-          required
           maxLength={60}
-          aria-describedby={state.error ? 'rename-error' : undefined}
-          className="border-line focus:border-brand w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm outline-none sm:w-64"
+          schema={botNameSchema}
+          className="sm:w-64"
         />
       </div>
       <SubmitButton variant="ghost" pendingLabel="Saving…">

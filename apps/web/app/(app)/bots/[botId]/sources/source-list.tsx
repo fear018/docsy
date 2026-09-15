@@ -30,6 +30,23 @@ function label(source: SourceRow): string {
   }
 }
 
+/**
+ * A spinner, not a dot.
+ *
+ * Indexing a large site can sit on the same page count for a while: the worker
+ * is fetching a wave of pages before it writes anything. A static marker next
+ * to an unchanging number reads as stuck, and the owner reloads or gives up.
+ * Something moving says the work is alive even when the number is not.
+ */
+function Spinner() {
+  return (
+    <span
+      aria-hidden
+      className="border-brand/30 border-t-brand mr-2 inline-block size-3.5 animate-spin rounded-full border-2 align-[-2px]"
+    />
+  );
+}
+
 function describe(source: SourceRow): string {
   switch (source.status) {
     case 'queued':
@@ -110,14 +127,27 @@ export function SourceList({ sources }: { sources: SourceRow[] }) {
                 source.status === 'error' ? 'text-red-600 dark:text-red-400' : 'text-muted'
               }`}
             >
-              {source.status === 'processing' && (
-                <span
-                  aria-hidden
-                  className="bg-brand mr-2 inline-block size-2 animate-pulse rounded-full align-middle"
-                />
-              )}
+              {(source.status === 'processing' || source.status === 'queued') && <Spinner />}
               {describe(source)}
             </p>
+
+            {source.status === 'processing' && source.total_pages > 0 && (
+              <div
+                className="bg-surface border-line mt-2 h-1 w-full max-w-xs overflow-hidden rounded-full border"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={source.total_pages}
+                aria-valuenow={source.pages_count}
+                aria-label="Indexing progress"
+              >
+                <div
+                  className="bg-brand h-full rounded-full transition-[width] duration-500"
+                  style={{
+                    width: `${Math.max((source.pages_count / source.total_pages) * 100, 3)}%`,
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex shrink-0 gap-2">

@@ -320,6 +320,7 @@ export type Database = {
           filename: string | null;
           id: string;
           last_synced_at: string | null;
+          max_pages: number;
           pages_count: number;
           status: Database['public']['Enums']['source_status'];
           storage_path: string | null;
@@ -337,6 +338,7 @@ export type Database = {
           filename?: string | null;
           id?: string;
           last_synced_at?: string | null;
+          max_pages?: number;
           pages_count?: number;
           status?: Database['public']['Enums']['source_status'];
           storage_path?: string | null;
@@ -354,6 +356,7 @@ export type Database = {
           filename?: string | null;
           id?: string;
           last_synced_at?: string | null;
+          max_pages?: number;
           pages_count?: number;
           status?: Database['public']['Enums']['source_status'];
           storage_path?: string | null;

@@ -1,8 +1,15 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import {
+  publicUrlSchema,
+  addTextSourceSchema,
+  addUrlSourceSchema,
+  DEFAULT_PAGES_PER_SOURCE,
+} from '@docsy/shared';
 import { addUrlSource, addTextSource, addFileSource, type SourceState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
+import { Field } from '@/components/field';
 
 type Kind = 'url' | 'file' | 'text';
 
@@ -46,21 +53,17 @@ export function AddSource({ botId }: { botId: string }) {
       <p className="text-muted mt-3 text-sm">{active.hint}</p>
 
       {kind === 'url' && (
-        <form action={urlAction} className="mt-4 space-y-3">
+        <form action={urlAction} noValidate className="mt-4 space-y-3">
           <input type="hidden" name="botId" value={botId} />
-          <div>
-            <label htmlFor="url" className="sr-only">
-              Documentation address
-            </label>
-            <input
-              id="url"
-              name="url"
-              type="url"
-              required
-              placeholder="https://acme.com/docs"
-              className={INPUT}
-            />
-          </div>
+          <Field
+            name="url"
+            label="Documentation address"
+            hideLabel
+            type="url"
+            inputMode="url"
+            placeholder="https://acme.com/docs"
+            schema={publicUrlSchema}
+          />
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -72,19 +75,32 @@ export function AddSource({ botId }: { botId: string }) {
             Index the whole site, not just this page
           </label>
           {crawl && (
-            <div>
-              <label htmlFor="pathPrefix" className="text-muted block text-sm">
-                Only paths starting with
-              </label>
-              <input
-                id="pathPrefix"
-                name="pathPrefix"
-                placeholder="/docs"
-                className={`${INPUT} mt-1`}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field
+                name="maxPages"
+                label="Index at most"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={500}
+                defaultValue={DEFAULT_PAGES_PER_SOURCE}
+                hint="Pages. Start small — you can raise it and re-sync."
+                schema={addUrlSourceSchema.shape.maxPages}
               />
-              <p className="text-muted mt-1 text-xs">
-                Leave empty to index everything the sitemap lists.
-              </p>
+              <div>
+                <label htmlFor="pathPrefix" className="text-muted block text-sm">
+                  Only paths starting with
+                </label>
+                <input
+                  id="pathPrefix"
+                  name="pathPrefix"
+                  placeholder="/docs"
+                  className={`${INPUT} mt-1`}
+                />
+                <p className="text-muted mt-1 text-xs">
+                  Leave empty to take whatever the sitemap lists.
+                </p>
+              </div>
             </div>
           )}
           <FieldError id="url-error">{urlState.error}</FieldError>
@@ -93,7 +109,7 @@ export function AddSource({ botId }: { botId: string }) {
       )}
 
       {kind === 'file' && (
-        <form action={fileAction} className="mt-4 space-y-3">
+        <form action={fileAction} noValidate className="mt-4 space-y-3">
           <input type="hidden" name="botId" value={botId} />
           <div>
             <label htmlFor="file" className="sr-only">
@@ -103,7 +119,6 @@ export function AddSource({ botId }: { botId: string }) {
               id="file"
               name="file"
               type="file"
-              required
               accept=".pdf,.docx,.md,.txt"
               className="file:border-line file:bg-surface w-full text-sm file:mr-3 file:rounded-lg file:border file:px-3 file:py-1.5 file:text-sm"
             />
@@ -114,27 +129,26 @@ export function AddSource({ botId }: { botId: string }) {
       )}
 
       {kind === 'text' && (
-        <form action={textAction} className="mt-4 space-y-3">
+        <form action={textAction} noValidate className="mt-4 space-y-3">
           <input type="hidden" name="botId" value={botId} />
-          <div>
-            <label htmlFor="title" className="sr-only">
-              Title
-            </label>
-            <input id="title" name="title" required placeholder="Refund policy" className={INPUT} />
-          </div>
-          <div>
-            <label htmlFor="content" className="sr-only">
-              Text
-            </label>
-            <textarea
-              id="content"
-              name="content"
-              required
-              rows={8}
-              placeholder="Paste the text here. Markdown headings help us cite it precisely."
-              className={`${INPUT} resize-y`}
-            />
-          </div>
+          <Field
+            name="title"
+            label="Title"
+            hideLabel
+            maxLength={200}
+            placeholder="Refund policy"
+            schema={addTextSourceSchema.shape.title}
+          />
+          <Field
+            name="content"
+            label="Text"
+            hideLabel
+            multiline
+            rows={8}
+            placeholder="Paste the text here. Markdown headings help us cite it precisely."
+            schema={addTextSourceSchema.shape.content}
+            className="resize-y"
+          />
           <FieldError id="text-error">{textState.error}</FieldError>
           <SubmitButton pendingLabel="Saving…">Add text</SubmitButton>
         </form>

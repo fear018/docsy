@@ -30,18 +30,46 @@ export type SourceType = (typeof SOURCE_TYPES)[number];
  * a crawler that will fetch any URL a user supplies is an SSRF hole.
  */
 export const publicUrlSchema = z
-  .url('Enter a full URL, including https://')
-  .refine((value) => /^https?:\/\//i.test(value), 'Only http and https are supported.')
-  .refine((value) => {
-    const host = new URL(value).hostname.toLowerCase();
-    if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.internal')) {
-      return false;
+  .string()
+  .trim()
+  .min(1, 'Enter the address of your documentation.')
+  .superRefine((value, ctx) => {
+    // One refinement rather than a chain: every check below needs a parsed URL,
+    // and parsing has to be able to fail without throwing. An earlier version
+    // called new URL() inside a chained refine, which raised on an empty string
+    // instead of reporting it — invisible while the browser still enforced
+    // required, and a server error the moment it did not.
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      ctx.addIssue({ code: 'custom', message: 'Enter a full URL, including https://' });
+      return;
     }
-    // IPv4 private and loopback ranges, plus IPv6 loopback.
-    return !/^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[?::1\]?$)/.test(
-      host,
-    );
-  }, 'That address is not reachable from the public internet.');
+
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      ctx.addIssue({ code: 'custom', message: 'Only http and https are supported.' });
+      return;
+    }
+
+    const host = url.hostname.toLowerCase();
+    const isPrivate =
+      host === 'localhost' ||
+      host.endsWith('.localhost') ||
+      host.endsWith('.internal') ||
+      /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[?::1\]?$)/.test(host);
+
+    if (isPrivate) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'That address is not reachable from the public internet.',
+      });
+    }
+  });
+
+/** How many pages one crawl may index, whatever the plan still allows. */
+export const MAX_PAGES_PER_SOURCE = 500;
+export const DEFAULT_PAGES_PER_SOURCE = 50;
 
 export const addUrlSourceSchema = z.object({
   botId: z.uuid(),
@@ -50,6 +78,17 @@ export const addUrlSourceSchema = z.object({
   crawlSite: z.boolean().default(false),
   /** Restrict a site crawl to URLs starting with this path, e.g. /docs. */
   pathPrefix: z.string().trim().max(200).optional(),
+  /**
+   * Stops a large site from spending the whole allowance in one go. A docs site
+   * with a thousand pages is normal, and indexing all of it before the owner
+   * has seen a single answer is not what they came for.
+   */
+  maxPages: z.coerce
+    .number()
+    .int()
+    .min(1, 'Index at least one page.')
+    .max(MAX_PAGES_PER_SOURCE, `Keep it to ${MAX_PAGES_PER_SOURCE} pages or fewer.`)
+    .default(DEFAULT_PAGES_PER_SOURCE),
 });
 
 export const addTextSourceSchema = z.object({

@@ -250,7 +250,9 @@ export async function ingestSource(sourceId: string): Promise<IngestResult> {
       if (!source.url) return await fail('That source has no address.');
       const discovered = await discoverUrls(source.url, {
         pathPrefix: source.type === 'sitemap' ? (source.filename ?? undefined) : undefined,
-        limit: source.type === 'sitemap' ? remaining : 1,
+        // The owner's cap for this crawl, never above what the plan still
+        // allows. Whichever runs out first wins.
+        limit: source.type === 'sitemap' ? Math.min(source.max_pages, remaining) : 1,
       });
       urls = discovered.urls;
       await supabase

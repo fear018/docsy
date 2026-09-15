@@ -1,8 +1,10 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { widgetConfigSchema } from '@docsy/shared';
 import { saveWidgetConfig, type WidgetState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
+import { Field } from '@/components/field';
 
 export interface WidgetForm {
   botId: string;
@@ -48,39 +50,33 @@ export function WidgetSettings(props: WidgetForm) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <form action={action} className="space-y-6">
+      <form action={action} noValidate className="space-y-6">
         <input type="hidden" name="botId" value={props.botId} />
 
         <section className="space-y-3">
           <h2 className="font-medium">Appearance</h2>
 
-          <div>
-            <label htmlFor="title" className="text-muted block text-sm">
-              Title
-            </label>
-            <input
-              id="title"
-              name="title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              maxLength={40}
-              required
-              className={`${INPUT} mt-1`}
-            />
-          </div>
+          <Field
+            name="title"
+            label="Title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            maxLength={40}
+            schema={widgetConfigSchema.shape.title}
+          />
 
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <label htmlFor="accent" className="text-muted block text-sm">
-                Accent colour
-              </label>
+              <span className="text-muted block text-sm">Accent colour</span>
               <div className="mt-1 flex items-center gap-2">
-                <input
-                  id="accent"
+                <Field
                   name="accent"
+                  label="Accent colour"
+                  hideLabel
                   value={accent}
                   onChange={(event) => setAccent(event.target.value)}
-                  className={`${INPUT} w-32 font-mono`}
+                  schema={widgetConfigSchema.shape.accent}
+                  className="w-32 font-mono"
                 />
                 <input
                   type="color"

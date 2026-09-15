@@ -49,6 +49,7 @@ export async function addUrlSource(_prev: SourceState, formData: FormData): Prom
     url: formData.get('url'),
     crawlSite: formData.get('crawlSite') === 'on',
     pathPrefix: formData.get('pathPrefix') || undefined,
+    maxPages: formData.get('maxPages') || undefined,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Check the address and try again.' };
@@ -66,6 +67,7 @@ export async function addUrlSource(_prev: SourceState, formData: FormData): Prom
     // Reusing filename for the crawl's path filter keeps the schema narrow;
     // it is the only per-type option a web source carries.
     filename: parsed.data.crawlSite ? (parsed.data.pathPrefix ?? null) : null,
+    max_pages: parsed.data.crawlSite ? parsed.data.maxPages : 1,
   });
 
   if (error) return { error: 'We could not add that source. Try again in a moment.' };

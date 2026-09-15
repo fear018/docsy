@@ -2,7 +2,9 @@
 
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
+import { z } from 'zod';
 import { signInWithEmail, signInWithGoogle, type LoginState } from './actions';
+import { Field } from '@/components/field';
 
 function SubmitButton({ children, variant }: { children: string; variant: 'primary' | 'ghost' }) {
   const { pending } = useFormStatus();
@@ -19,6 +21,8 @@ function SubmitButton({ children, variant }: { children: string; variant: 'prima
     </button>
   );
 }
+
+const emailField = z.email('Enter a valid email address.');
 
 export function LoginForm({ next, initialError }: { next: string; initialError?: string }) {
   const [state, formAction] = useActionState<LoginState, FormData>(signInWithEmail, {
@@ -50,28 +54,18 @@ export function LoginForm({ next, initialError }: { next: string; initialError?:
         <span className="bg-line h-px flex-1" />
       </div>
 
-      <form action={formAction} className="space-y-3">
+      <form action={formAction} noValidate className="space-y-3">
         <input type="hidden" name="next" value={next} />
-        <div>
-          <label htmlFor="email" className="sr-only">
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="you@company.com"
-            aria-describedby={state.error ? 'login-error' : undefined}
-            className="border-line focus:border-brand w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm outline-none"
-          />
-        </div>
-        {state.error && (
-          <p id="login-error" role="alert" className="text-sm text-red-600 dark:text-red-400">
-            {state.error}
-          </p>
-        )}
+        <Field
+          name="email"
+          label="Email address"
+          hideLabel
+          type="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          schema={emailField}
+          serverError={state.error}
+        />
         <SubmitButton variant="primary">Email me a link</SubmitButton>
       </form>
     </div>
