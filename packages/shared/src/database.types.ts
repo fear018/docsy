@@ -435,6 +435,24 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      match_chunks: {
+        Args: {
+          p_bot_id: string;
+          p_candidates?: number;
+          p_match_count?: number;
+          p_query_embedding: string;
+          p_query_text: string;
+        };
+        Returns: {
+          chunk_id: string;
+          content: string;
+          document_id: string;
+          document_title: string;
+          document_url: string;
+          heading_path: string;
+          score: number;
+        }[];
+      };
       owns_bot: { Args: { target_bot_id: string }; Returns: boolean };
     };
     Enums: {
