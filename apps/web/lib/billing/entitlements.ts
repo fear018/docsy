@@ -24,12 +24,13 @@ export interface Entitlements {
 }
 
 export async function getEntitlements(supabase: SupabaseClient<Database>): Promise<Entitlements> {
-  const usage = await getUsage(supabase);
-
-  const { data: bots } = await supabase
-    .from('bots')
-    .select('id')
-    .order('created_at', { ascending: true });
+  // Both in flight at once: every query crosses to another region, and two
+  // sequential round trips is a visible pause on a page that shows neither
+  // result until both arrive.
+  const [usage, { data: bots }] = await Promise.all([
+    getUsage(supabase),
+    supabase.from('bots').select('id').order('created_at', { ascending: true }),
+  ]);
 
   const readOnlyBotIds = new Set((bots ?? []).slice(usage.plan.limits.bots).map((bot) => bot.id));
 
