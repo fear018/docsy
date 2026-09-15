@@ -22,7 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-dvh">
       <header className="border-line border-b">
         <div className="mx-auto flex max-w-5xl items-center gap-6 px-5 py-3">
-          <Link href="/bots" className="text-sm font-semibold tracking-wide uppercase">
+          {/* The logo goes home, everywhere. Sending it to the app's own index
+              instead is a small surprise that costs people the way out. */}
+          <Link href="/" className="text-sm font-semibold tracking-wide uppercase">
             Docsy
           </Link>
           <AppNav />
