@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acme — a pretend customer site</title>
+    <style>
+      /*
+        Deliberately hostile. A customer's stylesheet is not written with our
+        widget in mind, and these are the rules that break embedded UI in the
+        wild: global resets, a heavy font stack, forced colours, and a z-index
+        arms race. If the widget survives this page, it survives real ones.
+      */
+      *,
+      *::before,
+      *::after {
+        box-sizing: content-box !important;
+      }
+      html {
+        font-size: 22px;
+      }
+      body {
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', serif;
+        background: #1b1b2f;
+        color: #f4c95d;
+        line-height: 2.1;
+      }
+      button,
+      input {
+        font: inherit !important;
+        color: #f4c95d !important;
+        background: #33335c !important;
+        border-radius: 0 !important;
+      }
+      div {
+        letter-spacing: 0.06em;
+      }
+      p {
+        text-transform: lowercase;
+      }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        pointer-events: none;
+      }
+      main {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 3rem 1.5rem;
+      }
+      code {
+        background: #33335c;
+        padding: 0.1em 0.3em;
+      }
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <main>
+      <h1>Acme Cloud</h1>
+      <p>
+        This page exists to test the Docsy widget from a foreign origin, under a stylesheet that
+        fights back. The widget lives in an iframe, so none of the rules above should reach inside
+        it.
+      </p>
+      <p>Things to check here:</p>
+      <div>
+        <p>— the launcher sits above the overlay</p>
+        <p>— nothing inside the panel inherits this page's serif, colours or casing</p>
+        <p>— escape closes it and focus returns to the launcher</p>
+        <p>— on a narrow screen the panel fills the viewport</p>
+      </div>
+      <p>
+        The button below calls <code>window.Docsy.open()</code>, the same API a customer would wire
+        to their own help link.
+      </p>
+      <button type="button" onclick="window.Docsy &amp;&amp; window.Docsy.open()">
+        Open the assistant
+      </button>
+    </main>
+
+    <!-- Replace data-bot with a real key, and the src host when testing against production. -->
+    <script
+      src="http://localhost:3000/widget.js"
+      data-bot="REPLACE_WITH_PUBLIC_KEY"
+      data-label="Ask Acme docs"
+      data-accent="#f4c95d"
+      defer
+    ></script>
+  </body>
+</html>

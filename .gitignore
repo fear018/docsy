@@ -29,3 +29,6 @@ supabase/.temp/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# built by @docsy/widget
+apps/web/public/widget.js

@@ -4,3 +4,4 @@ dist
 .turbo
 pnpm-lock.yaml
 supabase/.temp
+apps/web/public/widget.js

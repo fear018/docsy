@@ -4,7 +4,7 @@ import typescript from 'eslint-config-next/typescript';
 const asArray = (config) => (Array.isArray(config) ? config : [config]);
 
 const config = [
-  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'] },
+  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'public/widget.js'] },
   ...asArray(coreWebVitals),
   ...asArray(typescript),
   {

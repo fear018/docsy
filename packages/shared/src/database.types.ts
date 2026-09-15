@@ -292,6 +292,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      rate_limits: {
+        Row: {
+          hits: number;
+          key: string;
+          window_start: string;
+        };
+        Insert: {
+          hits?: number;
+          key: string;
+          window_start?: string;
+        };
+        Update: {
+          hits?: number;
+          key?: string;
+          window_start?: string;
+        };
+        Relationships: [];
+      };
       sources: {
         Row: {
           auto_sync: boolean;
@@ -435,6 +453,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      bot_by_public_key: {
+        Args: { p_public_key: string };
+        Returns: {
+          allowed_origins: string[];
+          bot_id: string;
+          owner_id: string;
+          plan: Database['public']['Enums']['plan_id'];
+          subscription_status: string;
+          tone: string;
+          widget_config: Json;
+        }[];
+      };
+      consume_message_quota: {
+        Args: { p_limit: number; p_user_id: string };
+        Returns: boolean;
+      };
+      consume_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window: string };
+        Returns: boolean;
+      };
       match_chunks: {
         Args: {
           p_bot_id: string;
