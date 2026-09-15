@@ -222,12 +222,22 @@ export function Chat({
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-medium">Conversations</h2>
           {(messages.length > 0 || openConversationId) && (
-            <Link
-              href={`/bots/${botId}/chat`}
+            <button
+              type="button"
+              onClick={() => {
+                // A link here pointed at the page we are already on, so nothing
+                // navigated and nothing happened. Clearing the state is what
+                // "new chat" actually means.
+                setMessages([]);
+                setError(null);
+                setQuestion('');
+                conversationId.current = null;
+                if (openConversationId) router.replace(`/bots/${botId}/chat`);
+              }}
               className="text-brand text-sm font-medium underline-offset-2 hover:underline"
             >
               New chat
-            </Link>
+            </button>
           )}
         </div>
 

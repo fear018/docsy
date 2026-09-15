@@ -32,3 +32,31 @@ begin;
   select 'anon sees subscriptions (expect 0): ' || count(*) as result from public.subscriptions;
   select 'anon sees chunks (expect 0): ' || count(*) as result from public.chunks;
 commit;
+
+-- The in-app chat writes under the owner's own session, not the service role.
+-- Without insert policies it failed there while the widget kept working, so
+-- these assert the path the owner actually uses.
+begin;
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+  insert into public.conversations (bot_id, channel, title)
+  values ('aaaaaaaa-0000-0000-0000-000000000001', 'app', 'owner can start one');
+  select 'alice starts a conversation (expect 1): ' || count(*) as result
+  from public.conversations where title = 'owner can start one';
+
+  insert into public.messages (conversation_id, role, content)
+  select id, 'user', 'hello' from public.conversations where title = 'owner can start one';
+  select 'alice adds a message (expect 1): ' || count(*) as result from public.messages;
+rollback;
+
+begin;
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+  -- Bob's bot is not hers, so this must write nothing rather than succeed.
+  insert into public.conversations (bot_id, channel, title)
+  select 'bbbbbbbb-0000-0000-0000-000000000002', 'app', 'not hers'
+  where public.owns_bot('bbbbbbbb-0000-0000-0000-000000000002');
+  select 'alice cannot start one on bob''s bot (expect 0): ' || count(*) as result
+  from public.conversations where title = 'not hers';
+rollback;
