@@ -32,4 +32,27 @@
     color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
   }
+
+  /*
+   * Browsers give links a pointer and buttons none, which is a distinction
+   * nobody outside the spec makes: to a person both are things you click.
+   * Set once here rather than repeated as a class on every control — a rule
+   * that has to be remembered is a rule that gets forgotten.
+   */
+  button:not(:disabled),
+  summary,
+  [role='button']:not([aria-disabled='true']),
+  label:has(> input[type='checkbox']),
+  label:has(> input[type='radio']),
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='color'],
+  input[type='file']::file-selector-button {
+    cursor: pointer;
+  }
+
+  /* A disabled control should look unavailable, not merely unresponsive. */
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
