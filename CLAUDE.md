@@ -47,6 +47,16 @@ Teams/roles/invites · human handoff · Slack/Discord/Intercom integrations · U
 user-selectable models · fine-tuning · charts dashboard · white-label / custom widget domain /
 arbitrary CSS · private docs behind authentication.
 
+## Skills
+
+`.claude/skills/` holds the repeatable procedures of this project:
+
+- **add-migration** — a migration plus its RLS policies, verified and typed
+- **add-route** — an API route with the right client, validation and error shape
+- **ui-review** — the checklist a screen passes before it counts as done
+
+Invoke the matching one rather than re-deriving the steps.
+
 ## Commands
 
 ```
