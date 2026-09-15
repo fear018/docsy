@@ -30,9 +30,16 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
 export default async function BillingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ upgraded?: string; portal?: string; plan?: string }>;
+  searchParams: Promise<{
+    upgraded?: string;
+    portal?: string;
+    plan?: string;
+    cancelled?: string;
+    resumed?: string;
+    cancel?: string;
+  }>;
 }) {
-  const { upgraded, portal, plan: wantedPlan } = await searchParams;
+  const { upgraded, portal, plan: wantedPlan, cancelled, resumed, cancel } = await searchParams;
   const supabase = await createClient();
   const usage = await getUsage(supabase);
   const { data: subscription } = await supabase
@@ -62,10 +69,30 @@ export default async function BillingPage({
         </p>
       </div>
 
-      {upgraded && (
+      {/* Only worth saying while it is still true. Once the plan has caught up,
+          telling someone to wait for it is noise. */}
+      {upgraded && usage.plan.id === 'free' && (
         <p role="status" className="border-line bg-surface rounded-lg border p-4 text-sm">
-          Payment received. If the plan below still says Free, give it a few seconds — Stripe
-          confirms it in the background.
+          Payment received. Stripe confirms it in the background — this page will show the new plan
+          within a few seconds.
+        </p>
+      )}
+
+      {cancelled && (
+        <p role="status" className="border-line bg-surface rounded-lg border p-4 text-sm">
+          Scheduled. You keep everything you paid for until the period ends, then move to Free.
+        </p>
+      )}
+
+      {resumed && (
+        <p role="status" className="border-line bg-surface rounded-lg border p-4 text-sm">
+          Your plan will continue as before.
+        </p>
+      )}
+
+      {cancel === 'failed' && (
+        <p role="alert" className="border-line rounded-lg border p-4 text-sm">
+          We could not reach Stripe just now. Try again, or use the billing portal below.
         </p>
       )}
 
@@ -104,6 +131,7 @@ export default async function BillingPage({
             current={usage.plan.id}
             plans={PLAN_IDS.map((id) => PLANS[id])}
             wanted={wantedPlan ?? null}
+            endingAt={subscription?.cancel_at_period_end ? periodEnd : null}
           />
         ) : (
           <p className="text-muted mt-3 text-sm">Checkout is not configured in this environment.</p>

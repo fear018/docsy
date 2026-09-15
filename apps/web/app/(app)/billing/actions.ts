@@ -108,3 +108,51 @@ export async function openPortal(): Promise<void> {
 
   redirect(url as Route);
 }
+
+/**
+ * Moves the owner back to Free at the end of the period they paid for.
+ *
+ * Not an immediate cancellation: they bought the month, and taking it away
+ * early would be taking something they are owed. Stripe keeps the subscription
+ * active until the period ends and then sends the event that drops the plan.
+ */
+export async function cancelSubscription(): Promise<void> {
+  const supabase = await createClient();
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('stripe_subscription_id')
+    .maybeSingle();
+
+  if (!subscription?.stripe_subscription_id) redirect('/billing');
+
+  try {
+    await stripe().subscriptions.update(subscription.stripe_subscription_id, {
+      cancel_at_period_end: true,
+    });
+  } catch {
+    redirect('/billing?cancel=failed');
+  }
+
+  redirect('/billing?cancelled=1');
+}
+
+/** Undoes the above while the period is still running. */
+export async function resumeSubscription(): Promise<void> {
+  const supabase = await createClient();
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('stripe_subscription_id')
+    .maybeSingle();
+
+  if (!subscription?.stripe_subscription_id) redirect('/billing');
+
+  try {
+    await stripe().subscriptions.update(subscription.stripe_subscription_id, {
+      cancel_at_period_end: false,
+    });
+  } catch {
+    redirect('/billing?cancel=failed');
+  }
+
+  redirect('/billing?resumed=1');
+}

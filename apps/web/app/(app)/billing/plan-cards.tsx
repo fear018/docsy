@@ -2,18 +2,27 @@
 
 import { useActionState } from 'react';
 import type { Plan, PlanId } from '@docsy/shared';
-import { startCheckout, openPortal, type BillingState } from './actions';
+import {
+  startCheckout,
+  openPortal,
+  cancelSubscription,
+  resumeSubscription,
+  type BillingState,
+} from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
 
 export function PlanCards({
   current,
   plans,
   wanted,
+  endingAt,
 }: {
   current: PlanId;
   plans: Plan[];
   /** The plan chosen on the landing page, carried through sign-in. */
   wanted?: string | null;
+  /** Set when the subscription is already scheduled to end. */
+  endingAt?: string | null;
 }) {
   const [state, action] = useActionState<BillingState, FormData>(startCheckout, {});
 
@@ -57,6 +66,30 @@ export function PlanCards({
                     {current === 'free' ? `Upgrade to ${plan.name}` : `Switch to ${plan.name}`}
                   </SubmitButton>
                 </form>
+              )}
+
+              {/* Moving to Free means ending the subscription. Offering it here
+                  rather than only inside Stripe's portal, because a plan you
+                  cannot leave from the plans page is a plan you cannot leave. */}
+              {plan.id === 'free' && current !== 'free' && (
+                <div className="mt-4">
+                  {endingAt ? (
+                    <>
+                      <p className="text-muted mb-2 text-sm">Starts {endingAt}.</p>
+                      <form action={resumeSubscription}>
+                        <SubmitButton variant="ghost" pendingLabel="Restoring…" className="w-full">
+                          Keep my plan
+                        </SubmitButton>
+                      </form>
+                    </>
+                  ) : (
+                    <form action={cancelSubscription}>
+                      <SubmitButton variant="ghost" pendingLabel="Scheduling…" className="w-full">
+                        Switch to Free
+                      </SubmitButton>
+                    </form>
+                  )}
+                </div>
               )}
             </div>
           );
