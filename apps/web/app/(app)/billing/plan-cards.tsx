@@ -35,7 +35,10 @@ export function PlanCards({
           return (
             <div
               key={plan.id}
-              className={`border-line rounded-lg border p-4 ${
+              // Flex column so the actions line up across cards whose feature
+              // lists are different lengths. A row of buttons at three
+              // different heights reads as carelessness.
+              className={`border-line flex flex-col rounded-lg border p-4 ${
                 isCurrent || isWanted ? 'border-brand' : ''
               } ${isWanted ? 'ring-brand/30 ring-2' : ''}`}
             >
@@ -51,7 +54,7 @@ export function PlanCards({
                 <span className="text-muted text-sm font-normal">/mo</span>
               </p>
               <p className="text-muted mt-2 text-sm">{plan.tagline}</p>
-              <ul className="text-muted mt-3 space-y-1 text-sm">
+              <ul className="text-muted mt-3 flex-1 space-y-1 text-sm">
                 <li>{plan.limits.bots} bots</li>
                 <li>{plan.limits.pages.toLocaleString()} pages</li>
                 <li>{plan.limits.messagesPerMonth.toLocaleString()} messages a month</li>
@@ -60,7 +63,7 @@ export function PlanCards({
               </ul>
 
               {!isCurrent && plan.id !== 'free' && (
-                <form action={action} className="mt-4">
+                <form action={action} className="mt-4 pt-1">
                   <input type="hidden" name="plan" value={plan.id} />
                   <SubmitButton pendingLabel="Opening…" className="w-full">
                     {current === 'free' ? `Upgrade to ${plan.name}` : `Switch to ${plan.name}`}

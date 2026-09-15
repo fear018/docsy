@@ -195,7 +195,12 @@ export default async function LandingPage() {
             return (
               <div
                 key={id}
-                className={`rounded-xl border p-5 ${highlight ? 'border-brand' : 'border-line'}`}
+                // Same reason as the billing page: the feature lists differ in
+                // length, so the cards are columns and the action sits at the
+                // bottom of each.
+                className={`flex flex-col rounded-xl border p-5 ${
+                  highlight ? 'border-brand' : 'border-line'
+                }`}
               >
                 <div className="flex items-baseline justify-between">
                   <p className="font-semibold">{plan.name}</p>
@@ -206,7 +211,7 @@ export default async function LandingPage() {
                   <span className="text-muted text-sm font-normal">/mo</span>
                 </p>
                 <p className="text-muted mt-2 text-sm">{plan.tagline}</p>
-                <ul className="mt-4 space-y-1.5 text-sm">
+                <ul className="mt-4 flex-1 space-y-1.5 text-sm">
                   <li>
                     {plan.limits.bots} bot{plan.limits.bots === 1 ? '' : 's'}
                   </li>
