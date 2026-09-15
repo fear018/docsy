@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useMemo, useState } from 'react';
 import { widgetConfigSchema } from '@docsy/shared';
 import { saveWidgetConfig, type WidgetState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
@@ -33,6 +33,28 @@ export function WidgetSettings(props: WidgetForm) {
     [...props.starters, '', '', '', ''].slice(0, 4),
   );
   const [copied, setCopied] = useState(false);
+
+  /**
+   * Debounced: every keystroke in the colour field would otherwise reload the
+   * frame, which flickers and serves no one.
+   */
+  const [settled, setSettled] = useState({ title, greeting, accent, starters });
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled({ title, greeting, accent, starters }), 400);
+    return () => clearTimeout(timer);
+  }, [title, greeting, accent, starters]);
+
+  const previewUrl = useMemo(() => {
+    const url = new URL(`/embed/${props.publicKey}`, props.appUrl);
+    url.searchParams.set('title', settled.title);
+    url.searchParams.set('accent', settled.accent);
+    if (props.fullCustomisation) {
+      if (settled.greeting) url.searchParams.set('greeting', settled.greeting);
+      const list = settled.starters.filter(Boolean);
+      if (list.length > 0) url.searchParams.set('starters', list.join('\n'));
+    }
+    return url.toString();
+  }, [settled, props.publicKey, props.appUrl, props.fullCustomisation]);
 
   const snippet = `<script src="${props.appUrl}/widget.js" data-bot="${props.publicKey}" data-label="${title.replace(/"/g, '&quot;')}" data-accent="${accent}"${
     position === 'left' ? ' data-position="left"' : ''
@@ -205,50 +227,17 @@ export function WidgetSettings(props: WidgetForm) {
       <aside className="space-y-6">
         <section>
           <h2 className="font-medium">Preview</h2>
-          <div className="border-line bg-surface relative mt-2 h-72 overflow-hidden rounded-lg border">
-            <div className="border-line bg-bg absolute inset-x-3 top-3 rounded-lg border shadow-sm">
-              <div className="border-line flex items-center justify-between border-b px-3 py-2">
-                <span className="truncate text-xs font-semibold">{title || 'Ask the docs'}</span>
-                <span className="text-muted text-xs">×</span>
-              </div>
-              <div className="space-y-2 p-3">
-                <p className="text-muted text-xs">
-                  {(props.fullCustomisation && greeting) || 'Ask anything about the documentation.'}
-                </p>
-                {props.fullCustomisation &&
-                  starters
-                    .filter(Boolean)
-                    .slice(0, 2)
-                    .map((starter) => (
-                      <span
-                        key={starter}
-                        className="border-line mr-1 inline-block rounded-full border px-2 py-1 text-[11px]"
-                      >
-                        {starter}
-                      </span>
-                    ))}
-              </div>
-              <div className="border-line flex gap-1.5 border-t p-2">
-                <span className="border-line text-muted flex-1 rounded border px-2 py-1 text-[11px]">
-                  Ask a question…
-                </span>
-                <span
-                  className="rounded px-2 py-1 text-[11px] font-medium text-white"
-                  style={{ background: accent }}
-                >
-                  Ask
-                </span>
-              </div>
-            </div>
-            <span
-              className={`absolute bottom-3 grid size-9 place-items-center rounded-full text-lg font-semibold text-white ${
-                position === 'left' ? 'left-3' : 'right-3'
-              }`}
-              style={{ background: accent }}
-              aria-hidden
-            >
-              ?
-            </span>
+          <p className="text-muted mt-1 text-sm">
+            The real widget, not a drawing of one — the same page your visitors open.
+          </p>
+          <div className="border-line bg-surface mt-2 overflow-hidden rounded-lg border">
+            <iframe
+              key={previewUrl}
+              src={previewUrl}
+              title="Widget preview"
+              className="h-96 w-full border-0"
+              style={{ colorScheme: 'light dark' }}
+            />
           </div>
         </section>
 
