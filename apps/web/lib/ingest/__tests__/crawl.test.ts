@@ -1,6 +1,13 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseRobots, isAllowed, parseSitemap, mapWithConcurrency } from '../crawl';
+import {
+  parseRobots,
+  isAllowed,
+  parseSitemap,
+  mapWithConcurrency,
+  describeFailure,
+  describeNetworkFailure,
+} from '../crawl';
 
 describe('parseRobots', () => {
   it('collects sitemap declarations', () => {
@@ -89,5 +96,42 @@ describe('mapWithConcurrency', () => {
       3,
     );
     assert.ok(peak <= 3, `peak concurrency was ${peak}`);
+  });
+});
+
+describe('failures are described in words the owner can act on', () => {
+  it('maps status codes to a next step, never the number alone', () => {
+    assert.match(describeFailure(401), /login/i);
+    assert.match(describeFailure(403), /login/i);
+    assert.match(describeFailure(404), /does not exist/i);
+    assert.match(describeFailure(429), /slow down/i);
+    assert.match(describeFailure(503), /error/i);
+  });
+
+  it('never leaks the bare "fetch failed" from a network error', () => {
+    const cases: unknown[] = [
+      Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } }),
+      Object.assign(new TypeError('fetch failed'), { cause: { code: 'UND_ERR_CONNECT_TIMEOUT' } }),
+      Object.assign(new TypeError('fetch failed'), { cause: { code: 'ECONNREFUSED' } }),
+      Object.assign(new Error('aborted'), { name: 'TimeoutError' }),
+      new Error('something else entirely'),
+    ];
+
+    for (const error of cases) {
+      const described = describeNetworkFailure(error, 'https://acme.com');
+      assert.doesNotMatch(described.message, /fetch failed/i, String(error));
+      assert.ok(described.message.endsWith('.'), 'reads as a sentence');
+    }
+  });
+
+  it('names the cause when it knows it', () => {
+    const named = (code: string) =>
+      describeNetworkFailure(Object.assign(new TypeError('fetch failed'), { cause: { code } }), 'u')
+        .message;
+
+    assert.match(named('ENOTFOUND'), /spelling/i);
+    assert.match(named('UND_ERR_CONNECT_TIMEOUT'), /too long/i);
+    assert.match(named('ECONNREFUSED'), /refused/i);
+    assert.match(named('CERT_HAS_EXPIRED'), /certificate/i);
   });
 });

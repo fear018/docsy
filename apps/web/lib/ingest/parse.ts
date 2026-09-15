@@ -144,10 +144,22 @@ export function htmlToMarkdown(html: string): ParsedDocument {
   return { title, markdown };
 }
 
+export class UnreadableFileError extends Error {}
+
 export async function pdfToMarkdown(data: Uint8Array): Promise<ParsedDocument> {
   const { extractText, getDocumentProxy } = await import('unpdf');
-  const pdf = await getDocumentProxy(data);
-  const { text } = await extractText(pdf, { mergePages: true });
+
+  let text: string | string[];
+  try {
+    const pdf = await getDocumentProxy(data);
+    ({ text } = await extractText(pdf, { mergePages: true }));
+  } catch {
+    // The library's own wording — "Invalid PDF structure" — is about its
+    // parser, not about anything the owner can act on.
+    throw new UnreadableFileError(
+      'We could not open that PDF. It may be damaged or password-protected.',
+    );
+  }
 
   // A PDF carries no heading structure we can trust, so the text is passed
   // through as prose and the chunker splits it by size.

@@ -28,7 +28,7 @@ export class FetchError extends Error {
 }
 
 /** Turns a failure into something the owner can act on, not a status code. */
-function describeFailure(status: number): string {
+export function describeFailure(status: number): string {
   if (status === 401 || status === 403) return 'That page is behind a login.';
   if (status === 404) return 'That page does not exist.';
   if (status === 429) return 'The site asked us to slow down. Try again later.';
@@ -36,12 +36,54 @@ function describeFailure(status: number): string {
   return `The site responded with status ${status}.`;
 }
 
+/**
+ * Network failures arrive as a bare "fetch failed", which tells the owner
+ * nothing about whether they mistyped the address, the site is slow, or it
+ * blocked us. Each cause gets the sentence that names the next step.
+ */
+export function describeNetworkFailure(error: unknown, url: string): FetchError {
+  const name = (error as { name?: string })?.name ?? '';
+  const code = (error as { cause?: { code?: string } })?.cause?.code ?? '';
+
+  // Two kinds of slow: our own signal firing, and undici giving up on the
+  // connection before a response ever started.
+  if (
+    name === 'TimeoutError' ||
+    name === 'AbortError' ||
+    code === 'UND_ERR_CONNECT_TIMEOUT' ||
+    code === 'UND_ERR_HEADERS_TIMEOUT'
+  ) {
+    return new FetchError('That site took too long to answer.', url);
+  }
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+    return new FetchError('We could not find that address. Check the spelling.', url);
+  }
+  if (code === 'ECONNREFUSED' || code === 'ECONNRESET') {
+    return new FetchError('That site refused the connection.', url);
+  }
+  if (
+    code.startsWith('ERR_TLS') ||
+    code === 'CERT_HAS_EXPIRED' ||
+    code === 'DEPTH_ZERO_SELF_SIGNED_CERT'
+  ) {
+    return new FetchError('That site has a certificate problem, so we did not trust it.', url);
+  }
+  return new FetchError('We could not reach that site.', url);
+}
+
 async function request(url: string, accept: string): Promise<Response> {
-  const response = await fetch(url, {
-    headers: { 'user-agent': USER_AGENT, accept },
-    redirect: 'follow',
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: { 'user-agent': USER_AGENT, accept },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (error instanceof FetchError) throw error;
+    throw describeNetworkFailure(error, url);
+  }
+
   if (!response.ok) throw new FetchError(describeFailure(response.status), url);
   return response;
 }

@@ -2,7 +2,13 @@ import { createHash } from 'node:crypto';
 import { getPlan } from '@docsy/shared';
 import { createServiceClient } from '@/lib/supabase/service';
 import { discoverUrls, fetchPage, FetchError, mapWithConcurrency } from './crawl';
-import { htmlToMarkdown, pdfToMarkdown, docxToMarkdown, plainTextToMarkdown } from './parse';
+import {
+  htmlToMarkdown,
+  pdfToMarkdown,
+  docxToMarkdown,
+  plainTextToMarkdown,
+  UnreadableFileError,
+} from './parse';
 import { chunkMarkdown } from './chunk';
 import { embedAll } from './embed';
 
@@ -33,6 +39,7 @@ function hash(text: string): string {
 
 function describe(error: unknown): string {
   if (error instanceof FetchError) return error.message;
+  if (error instanceof UnreadableFileError) return error.message;
   if (error instanceof Error && /OPENAI_API_KEY/.test(error.message)) {
     return 'Indexing is unavailable right now. We have been notified.';
   }
