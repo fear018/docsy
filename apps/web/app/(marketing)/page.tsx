@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { Route } from 'next';
 import { PLAN_IDS, PLANS } from '@docsy/shared';
 import { publicEnv } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
@@ -80,8 +81,12 @@ export default async function LandingPage() {
    * was bounced straight to their bots, and someone signing up arrived with no
    * memory of which plan they had picked.
    */
-  const choosePlan = (plan: string) =>
-    user ? `/billing?plan=${plan}` : `/login?next=${encodeURIComponent(`/billing?plan=${plan}`)}`;
+  // Typed as Route because the query is built at runtime, which typedRoutes
+  // cannot verify on its own.
+  const choosePlan = (plan: string): Route =>
+    (user
+      ? `/billing?plan=${plan}`
+      : `/login?next=${encodeURIComponent(`/billing?plan=${plan}`)}`) as Route;
 
   return (
     <main className="pb-24">
@@ -216,14 +221,14 @@ export default async function LandingPage() {
                   <li className="text-muted capitalize">{plan.features.autoSync} re-indexing</li>
                 </ul>
                 <Link
-                  href="/login"
+                  href={id === 'free' ? (user ? '/bots' : '/login') : choosePlan(id)}
                   className={`mt-5 block rounded-lg px-4 py-2.5 text-center text-sm font-medium transition ${
                     highlight
                       ? 'bg-brand text-brand-fg hover:opacity-90'
                       : 'border-line hover:bg-surface border'
                   }`}
                 >
-                  {id === 'free' ? 'Start free' : `Choose ${plan.name}`}
+                  {id === 'free' ? (user ? 'Open app' : 'Start free') : `Choose ${plan.name}`}
                 </Link>
               </div>
             );

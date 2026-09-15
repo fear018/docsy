@@ -5,6 +5,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "strict": true,
+    // An unused local is usually an edit that did not land where it was meant to.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "allowJs": true,
     "skipLibCheck": true,
