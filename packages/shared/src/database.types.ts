@@ -46,7 +46,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           name: string;
-          public_key: string;
+          public_key?: string;
           system_prompt?: string | null;
           tone?: string;
           updated_at?: string;
