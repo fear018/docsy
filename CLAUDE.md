@@ -25,6 +25,8 @@ demo-site/        static page to test the widget on a foreign origin
 ## Rules
 
 - **Never commit secrets.** `.env.local` is gitignored; the repo is public.
+- Env lives in `apps/web/.env.local` — Next only reads it from its own directory, not the
+  monorepo root. Root scripts that need it source it from there.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only. It must never reach a client bundle.
 - Plan limits live in `packages/shared/src/plans.ts` — one source of truth, never inline a limit.
 - Quota is checked **before** calling the model, never after.
