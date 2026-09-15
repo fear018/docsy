@@ -27,6 +27,8 @@ const publicSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20),
   NEXT_PUBLIC_APP_URL: z.url().default('http://localhost:3000'),
+  // Optional: the landing page's live demo is hidden when it is not set.
+  NEXT_PUBLIC_DEMO_BOT_KEY: z.string().min(8).optional(),
 });
 
 // Next.js inlines NEXT_PUBLIC_* only when referenced statically, so they are listed
@@ -35,6 +37,7 @@ const publicParsed = publicSchema.safeParse({
   NEXT_PUBLIC_SUPABASE_URL: present(process.env.NEXT_PUBLIC_SUPABASE_URL),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: present(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
   NEXT_PUBLIC_APP_URL: present(process.env.NEXT_PUBLIC_APP_URL),
+  NEXT_PUBLIC_DEMO_BOT_KEY: present(process.env.NEXT_PUBLIC_DEMO_BOT_KEY),
 });
 
 export const publicEnv = publicParsed.success
