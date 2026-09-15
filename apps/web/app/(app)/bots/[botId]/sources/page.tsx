@@ -1,10 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
+import { getEntitlements, isReadOnly } from '@/lib/billing/entitlements';
 import { AddSource } from './add-source';
 import { SourceList, type SourceRow } from './source-list';
 
 export default async function SourcesPage({ params }: { params: Promise<{ botId: string }> }) {
   const { botId } = await params;
   const supabase = await createClient();
+  const entitlements = await getEntitlements(supabase);
+  const frozen = isReadOnly(entitlements, botId);
 
   const { data: sources, error } = await supabase
     .from('sources')
@@ -25,7 +28,17 @@ export default async function SourcesPage({ params }: { params: Promise<{ botId:
 
   return (
     <div>
-      <AddSource botId={botId} />
+      {frozen ? (
+        <div className="border-line rounded-lg border border-dashed p-6 text-sm">
+          <p className="font-medium">This bot is read-only</p>
+          <p className="text-muted mt-1">
+            It sits above what your plan covers, so its sources are frozen. Nothing has been deleted
+            and the widget still answers. Upgrade to edit it again.
+          </p>
+        </div>
+      ) : (
+        <AddSource botId={botId} />
+      )}
       <SourceList sources={sources as SourceRow[]} />
     </div>
   );

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { addUrlSourceSchema, addTextSourceSchema, sourceIdSchema, getPlan } from '@docsy/shared';
 import { createClient } from '@/lib/supabase/server';
+import { getEntitlements, isReadOnly } from '@/lib/billing/entitlements';
 
 export interface SourceState {
   error?: string;
@@ -17,6 +18,20 @@ const ACCEPTED = {
 } as const;
 
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
+
+const FROZEN =
+  'This bot is above what your plan covers, so its sources are frozen. Upgrade to change it.';
+
+/**
+ * Hiding a control is not enforcement — a form can be replayed. Every action
+ * that changes a bot re-checks the freeze here, on the server.
+ */
+async function frozen(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  botId: string,
+): Promise<boolean> {
+  return isReadOnly(await getEntitlements(supabase), botId);
+}
 
 /** Refuses a new source once the owner's page allowance is spent. */
 async function pagesExhausted(supabase: Awaited<ReturnType<typeof createClient>>) {
@@ -40,6 +55,7 @@ export async function addUrlSource(_prev: SourceState, formData: FormData): Prom
   }
 
   const supabase = await createClient();
+  if (await frozen(supabase, parsed.data.botId)) return { error: FROZEN };
   const exhausted = await pagesExhausted(supabase);
   if (exhausted) return { error: exhausted };
 
@@ -69,6 +85,7 @@ export async function addTextSource(_prev: SourceState, formData: FormData): Pro
   }
 
   const supabase = await createClient();
+  if (await frozen(supabase, parsed.data.botId)) return { error: FROZEN };
   const exhausted = await pagesExhausted(supabase);
   if (exhausted) return { error: exhausted };
 
@@ -103,6 +120,7 @@ export async function addFileSource(_prev: SourceState, formData: FormData): Pro
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  if (await frozen(supabase, botId)) return { error: FROZEN };
   const exhausted = await pagesExhausted(supabase);
   if (exhausted) return { error: exhausted };
 
@@ -139,6 +157,7 @@ export async function deleteSource(formData: FormData) {
     .eq('id', parsed.data.sourceId)
     .maybeSingle();
   if (!source) return;
+  if (await frozen(supabase, source.bot_id)) return;
 
   // Documents and chunks cascade; the stored file does not.
   await supabase.from('sources').delete().eq('id', parsed.data.sourceId);
@@ -158,6 +177,7 @@ export async function resyncSource(formData: FormData) {
     .eq('id', parsed.data.sourceId)
     .maybeSingle();
   if (!source) return;
+  if (await frozen(supabase, source.bot_id)) return;
 
   // Clearing discovery makes a re-sync pick up pages added since last time.
   // Existing documents stay: unchanged ones are skipped by content hash.

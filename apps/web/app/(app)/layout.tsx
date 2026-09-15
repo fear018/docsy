@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getEntitlements } from '@/lib/billing/entitlements';
+import { UsageBanner } from '@/components/usage-banner';
 import { signOut } from '../(auth)/login/actions';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +14,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // The proxy already redirects anonymous visitors; this is the second
   // line of defence, and it also narrows the type for everything below.
   if (!user) redirect('/login');
+
+  const entitlements = await getEntitlements(supabase);
 
   return (
     <div className="min-h-dvh">
@@ -38,6 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </form>
         </div>
       </header>
+      <UsageBanner usage={entitlements.usage} readOnlyBots={entitlements.readOnlyBotIds.size} />
       <main className="mx-auto max-w-5xl px-5 py-10">{children}</main>
     </div>
   );

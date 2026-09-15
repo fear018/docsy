@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { widgetConfigSchema, effectivePlan } from '@docsy/shared';
 import { createClient } from '@/lib/supabase/server';
+import { getEntitlements, isReadOnly } from '@/lib/billing/entitlements';
 
 export interface WidgetState {
   error?: string;
@@ -45,6 +46,11 @@ export async function saveWidgetConfig(
   }
 
   const supabase = await createClient();
+  const entitlements = await getEntitlements(supabase);
+  if (isReadOnly(entitlements, parsed.data.botId)) {
+    return { error: 'This bot is above what your plan covers. Upgrade to change its widget.' };
+  }
+
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('plan, status')
