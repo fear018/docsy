@@ -297,6 +297,7 @@ export type Database = {
           auto_sync: boolean;
           bot_id: string;
           created_at: string;
+          discovered_urls: Json;
           error_message: string | null;
           filename: string | null;
           id: string;
@@ -304,6 +305,7 @@ export type Database = {
           pages_count: number;
           status: Database['public']['Enums']['source_status'];
           storage_path: string | null;
+          total_pages: number;
           type: Database['public']['Enums']['source_type'];
           updated_at: string;
           url: string | null;
@@ -312,6 +314,7 @@ export type Database = {
           auto_sync?: boolean;
           bot_id: string;
           created_at?: string;
+          discovered_urls?: Json;
           error_message?: string | null;
           filename?: string | null;
           id?: string;
@@ -319,6 +322,7 @@ export type Database = {
           pages_count?: number;
           status?: Database['public']['Enums']['source_status'];
           storage_path?: string | null;
+          total_pages?: number;
           type: Database['public']['Enums']['source_type'];
           updated_at?: string;
           url?: string | null;
@@ -327,6 +331,7 @@ export type Database = {
           auto_sync?: boolean;
           bot_id?: string;
           created_at?: string;
+          discovered_urls?: Json;
           error_message?: string | null;
           filename?: string | null;
           id?: string;
@@ -334,6 +339,7 @@ export type Database = {
           pages_count?: number;
           status?: Database['public']['Enums']['source_status'];
           storage_path?: string | null;
+          total_pages?: number;
           type?: Database['public']['Enums']['source_type'];
           updated_at?: string;
           url?: string | null;
