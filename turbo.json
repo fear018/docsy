@@ -17,7 +17,10 @@
         "STRIPE_PRICE_PRO",
         "STRIPE_PRICE_BUSINESS",
         "CRON_SECRET",
-        "SENTRY_DSN"
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "SENTRY_AUTH_TOKEN"
       ]
     },
     "build": {
@@ -35,7 +38,10 @@
         "STRIPE_PRICE_PRO",
         "STRIPE_PRICE_BUSINESS",
         "CRON_SECRET",
-        "SENTRY_DSN"
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "SENTRY_AUTH_TOKEN"
       ]
     },
     "lint": {

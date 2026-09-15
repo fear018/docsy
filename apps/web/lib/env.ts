@@ -14,6 +14,15 @@ function explain(error: z.ZodError, where: string): never {
   );
 }
 
+/**
+ * A variable declared with no value — common when a deployment platform is
+ * seeded from .env.example — arrives as an empty string, which would slip past
+ * a required check as "invalid" and defeat .default(). Treat it as absent.
+ */
+function present(value: string | undefined): string | undefined {
+  return value && value.trim() !== '' ? value : undefined;
+}
+
 const publicSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20),
@@ -23,9 +32,9 @@ const publicSchema = z.object({
 // Next.js inlines NEXT_PUBLIC_* only when referenced statically, so they are listed
 // one by one instead of passing process.env wholesale.
 const publicParsed = publicSchema.safeParse({
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_SUPABASE_URL: present(process.env.NEXT_PUBLIC_SUPABASE_URL),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: present(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+  NEXT_PUBLIC_APP_URL: present(process.env.NEXT_PUBLIC_APP_URL),
 });
 
 export const publicEnv = publicParsed.success
@@ -44,7 +53,7 @@ export function serverEnv() {
   }
   if (!cachedServerEnv) {
     const parsed = serverSchema.safeParse({
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      SUPABASE_SERVICE_ROLE_KEY: present(process.env.SUPABASE_SERVICE_ROLE_KEY),
     });
     cachedServerEnv = parsed.success ? parsed.data : explain(parsed.error, 'serverEnv()');
   }
