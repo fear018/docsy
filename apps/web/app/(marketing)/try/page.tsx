@@ -26,8 +26,8 @@ export default function TryPage() {
         <h2 className="font-medium">What to look at</h2>
         <ul className="text-muted space-y-1.5">
           <li>
-            — Tick the hostile CSS box. The page turns to serif and lowercase; nothing inside the
-            widget changes, because it runs in its own frame.
+            — Nothing on this page reaches inside the widget, and nothing inside it reaches out. It
+            runs in its own frame, which is why your stylesheet will not break it either.
           </li>
           <li>
             — Press Escape with the widget open. It closes and the focus returns to the launcher.
