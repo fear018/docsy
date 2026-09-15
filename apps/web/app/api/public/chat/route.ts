@@ -17,8 +17,12 @@ const bodySchema = z.object({
   question: z.string().trim().min(1).max(1000),
   conversationId: z.uuid().nullish(),
   visitorId: z.string().min(8).max(64),
-  /** The page the widget is embedded in, as reported by the browser. */
-  parentOrigin: z.string().max(200).optional(),
+  /**
+   * The page the widget is embedded in, as reported by the browser. Nullish,
+   * not optional: the settings preview opens the embed route directly, with no
+   * parent to report, and null is not the same as absent to a schema.
+   */
+  parentOrigin: z.string().max(200).nullish(),
 });
 
 function line(value: unknown): Uint8Array {
@@ -45,7 +49,7 @@ function visitorKey(request: NextRequest, publicKey: string, visitorId: string):
   return createHash('sha256').update(`${publicKey}:${address}:${visitorId}`).digest('hex');
 }
 
-function originAllowed(allowed: string[], parentOrigin: string | undefined): boolean {
+function originAllowed(allowed: string[], parentOrigin: string | null | undefined): boolean {
   // An empty list means the owner has not restricted the widget yet.
   if (allowed.length === 0) return true;
   if (!parentOrigin) return false;

@@ -35,12 +35,13 @@ export function WidgetSettings(props: WidgetForm) {
   const [copied, setCopied] = useState(false);
 
   /**
-   * Debounced: every keystroke in the colour field would otherwise reload the
-   * frame, which flickers and serves no one.
+   * Debounced generously. A starter question is a whole sentence, and
+   * reloading the frame between words is worse than waiting a moment after
+   * the last one.
    */
   const [settled, setSettled] = useState({ title, greeting, accent, starters });
   useEffect(() => {
-    const timer = setTimeout(() => setSettled({ title, greeting, accent, starters }), 400);
+    const timer = setTimeout(() => setSettled({ title, greeting, accent, starters }), 1200);
     return () => clearTimeout(timer);
   }, [title, greeting, accent, starters]);
 
