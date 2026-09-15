@@ -24,6 +24,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Link href="/bots" className="text-muted hover:text-fg transition">
               Bots
             </Link>
+            <Link href="/billing" className="text-muted hover:text-fg transition">
+              Plan
+            </Link>
             <Link href="/settings" className="text-muted hover:text-fg transition">
               Settings
             </Link>
