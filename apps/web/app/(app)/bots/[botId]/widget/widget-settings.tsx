@@ -119,7 +119,9 @@ export function WidgetSettings(props: WidgetForm) {
             <fieldset disabled={!props.fullCustomisation}>
               <legend className="text-muted text-sm">Side</legend>
               <div className="mt-1 flex gap-1">
-                {(['right', 'left'] as const).map((side) => (
+                {/* Left on the left. A control that contradicts the thing it
+                    sets makes you read it twice. */}
+                {(['left', 'right'] as const).map((side) => (
                   <label
                     key={side}
                     /*

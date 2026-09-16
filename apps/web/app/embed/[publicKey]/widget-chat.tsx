@@ -11,6 +11,30 @@ interface Message {
   citations: CitationRef[];
 }
 
+/**
+ * Text that stays readable on whatever colour the customer picked.
+ *
+ * The accent is theirs to choose and some of them pick a bright green. White
+ * on that is a label you have to lean in to read, which is not a thing we get
+ * to ask of their visitors.
+ */
+function readableOn(hex: string): string {
+  const full =
+    hex.length === 4
+      ? hex
+          .slice(1)
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : hex.slice(1);
+  const value = Number.parseInt(full, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  // Perceived brightness, not the raw average: the eye weights green heavily.
+  return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#14171a' : '#ffffff';
+}
+
 /** Stable per browser so a visitor's own conversation survives a reload. */
 function visitorId(): string {
   const KEY = 'docsy.visitor';
@@ -147,8 +171,19 @@ export function WidgetChat({
   return (
     <div
       className="flex h-dvh flex-col"
+      /*
+       * --brand, not --color-brand. Tailwind's `@theme inline` compiles
+       * bg-brand down to var(--brand) and drops the --color-* name entirely,
+       * so overriding the one the theme block reads changed nothing and the
+       * accent silently did not work anywhere in the frame.
+       */
       style={
-        config.accent ? ({ '--color-brand': config.accent } as React.CSSProperties) : undefined
+        config.accent
+          ? ({
+              '--brand': config.accent,
+              '--brand-fg': readableOn(config.accent),
+            } as React.CSSProperties)
+          : undefined
       }
     >
       <header className="border-line flex items-center justify-between gap-3 border-b px-4 py-3">

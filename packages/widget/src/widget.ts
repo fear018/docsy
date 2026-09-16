@@ -36,11 +36,27 @@ function readOptions(): Options | null {
   };
 }
 
+/**
+ * Readable text for whatever accent the customer chose. A bright accent with
+ * white on it is a label their visitors have to squint at, and the launcher is
+ * the one part of us that is always on screen.
+ */
+function readableOn(hex: string): string {
+  const match = /^#(?:([0-9a-f]{3})|([0-9a-f]{6}))$/i.exec(hex.trim());
+  if (!match) return '#fff';
+  const full = match[1] ? match[1].replace(/./g, (c) => c + c) : match[2]!;
+  const value = parseInt(full, 16);
+  const brightness =
+    (((value >> 16) & 255) * 299 + ((value >> 8) & 255) * 587 + (value & 255) * 114) / 1000;
+  return brightness > 150 ? '#14171a' : '#fff';
+}
+
 /** Object.assign onto a style needs a partial, not the full interface. */
 type Styles = Partial<Record<keyof CSSStyleDeclaration, string>> & Record<string, string>;
 
 function build(options: Options) {
   const side = options.position;
+  const onAccent = readableOn(options.accent);
 
   const launcher = document.createElement('button');
   launcher.type = 'button';
@@ -57,7 +73,7 @@ function build(options: Options) {
     border: '0',
     cursor: 'pointer',
     background: options.accent,
-    color: '#fff',
+    color: onAccent,
     boxShadow: '0 4px 14px rgba(0,0,0,.2)',
     display: 'grid',
     placeItems: 'center',
@@ -106,7 +122,7 @@ function build(options: Options) {
     inset: '0',
     display: 'grid',
     placeItems: 'center',
-    color: '#fff',
+    color: onAccent,
     font: '500 13px/1 system-ui, sans-serif',
     opacity: '.9',
   } satisfies Styles);
