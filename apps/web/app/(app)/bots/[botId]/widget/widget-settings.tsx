@@ -122,8 +122,18 @@ export function WidgetSettings(props: WidgetForm) {
                 {(['right', 'left'] as const).map((side) => (
                   <label
                     key={side}
-                    className={`border-line cursor-pointer rounded-lg border px-3 py-2 text-sm capitalize ${
-                      position === side ? 'border-brand font-medium' : ''
+                    /*
+                     * The chosen side is filled, not merely outlined. A border
+                     * in the accent colour is the kind of difference you find
+                     * by comparing the two buttons — which is one comparison
+                     * more than anybody should have to make to read a setting.
+                     * The ring is here because the radio itself is sr-only, so
+                     * without it the keyboard focus lands somewhere invisible.
+                     */
+                    className={`has-[:focus-visible]:ring-brand has-[:focus-visible]:ring-offset-bg cursor-pointer rounded-lg border px-3 py-2 text-sm capitalize transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-offset-2 ${
+                      position === side
+                        ? 'border-brand bg-brand text-brand-fg font-medium'
+                        : 'border-line hover:bg-surface'
                     } ${props.fullCustomisation ? '' : 'opacity-50'}`}
                   >
                     <input
