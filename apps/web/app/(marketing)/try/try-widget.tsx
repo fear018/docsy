@@ -59,6 +59,7 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
   const [snippet, setSnippet] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState<Parsed | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   // Leaving this page must take the widget with it. Guessing which nodes are
@@ -71,7 +72,7 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
     };
   }, []);
 
-  function load(raw: string) {
+  function load(raw: string, demo = false) {
     const parsed = parseSnippet(raw);
     if ('error' in parsed) {
       setError(parsed.error);
@@ -95,7 +96,23 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
     document.body.append(script);
     scriptRef.current = script;
     setLoaded(parsed);
+    setIsDemo(demo);
   }
+
+  /**
+   * The landing page sends people here with "load it on our test page", so the
+   * page had better have something running when they arrive. A form and an
+   * empty corner reads as broken, not as an invitation.
+   *
+   * Their own snippet replaces the demo; nothing is stacked.
+   */
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current || !demoKey) return;
+    started.current = true;
+    setSnippet(demoKey);
+    load(demoKey, true);
+  }, [demoKey]);
 
   return (
     <div className="border-line bg-surface rounded-xl border p-5">
@@ -136,7 +153,7 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
             type="button"
             onClick={() => {
               setSnippet(demoKey);
-              load(demoKey);
+              load(demoKey, true);
             }}
             className="border-line hover:bg-surface rounded-lg border px-4 py-2.5 text-sm font-medium transition"
           >
@@ -147,7 +164,9 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
 
       {loaded && (
         <p role="status" className="text-muted mt-3 text-sm">
-          Loaded. The launcher is in the corner — open it and ask something.
+          {isDemo
+            ? 'The demo bot is running — the launcher is in the corner. Paste your own snippet above to replace it.'
+            : 'Loaded. The launcher is in the corner — open it and ask something.'}
         </p>
       )}
     </div>

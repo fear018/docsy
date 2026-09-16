@@ -14,8 +14,9 @@ export default function TryPage() {
     <main className="mx-auto max-w-2xl px-5 py-16">
       <h1 className="text-3xl font-semibold tracking-tight">Try the widget</h1>
       <p className="text-muted mt-3">
-        This page stands in for a customer&rsquo;s website. Paste a snippet and the widget loads
-        here, on a page that knows nothing about your bot.
+        This page stands in for a customer&rsquo;s website. The demo bot is already running in the
+        corner; paste your own snippet to put your bot there instead, on a page that knows nothing
+        about it.
       </p>
 
       <div className="mt-8">
