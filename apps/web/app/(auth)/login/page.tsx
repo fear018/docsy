@@ -26,7 +26,7 @@ export default async function LoginPage({
         No password. Continue with Google, or we will email you a link.
       </p>
 
-      <LoginForm next={next ?? '/bots'} initialError={error ? ERRORS[error] : undefined} />
+      <LoginForm next={next ?? '/'} initialError={error ? ERRORS[error] : undefined} />
     </main>
   );
 }

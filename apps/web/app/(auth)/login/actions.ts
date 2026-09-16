@@ -22,7 +22,7 @@ async function origin() {
 /** Keep the post-login destination inside our own app. */
 function safeNext(value: FormDataEntryValue | null): string {
   const next = typeof value === 'string' ? value : '';
-  return next.startsWith('/') && !next.startsWith('//') ? next : '/bots';
+  return next.startsWith('/') && !next.startsWith('//') ? next : '/';
 }
 
 export async function signInWithGoogle(formData: FormData) {

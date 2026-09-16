@@ -8,8 +8,10 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get('code');
-  const nextParam = searchParams.get('next') ?? '/bots';
-  const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/bots';
+  // Home unless they were heading somewhere: a chosen plan or a page they
+  // opened by link still wins.
+  const nextParam = searchParams.get('next') ?? '/';
+  const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/';
 
   if (code) {
     const supabase = await createClient();
