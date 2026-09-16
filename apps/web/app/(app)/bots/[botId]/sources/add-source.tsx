@@ -19,9 +19,6 @@ const KINDS: { id: Kind; label: string; hint: string }[] = [
   { id: 'text', label: 'Text', hint: 'Paste anything that is not published anywhere yet.' },
 ];
 
-const INPUT =
-  'border-line focus:border-brand w-full rounded-lg border bg-transparent px-4.5 text-sm outline-none h-10';
-
 export function AddSource({ botId }: { botId: string }) {
   const [kind, setKind] = useState<Kind>('url');
   const [crawl, setCrawl] = useState(true);
@@ -87,20 +84,12 @@ export function AddSource({ botId }: { botId: string }) {
                 hint="Pages. Start small — you can raise it and re-sync."
                 schema={addUrlSourceSchema.shape.maxPages}
               />
-              <div>
-                <label htmlFor="pathPrefix" className="text-muted block text-sm">
-                  Only paths starting with
-                </label>
-                <input
-                  id="pathPrefix"
-                  name="pathPrefix"
-                  placeholder="/docs"
-                  className={`${INPUT} mt-1`}
-                />
-                <p className="text-muted mt-1 text-xs">
-                  Leave empty to take whatever the sitemap lists.
-                </p>
-              </div>
+              <Field
+                name="pathPrefix"
+                label="Only paths starting with"
+                placeholder="/docs"
+                hint="Leave empty to take whatever the sitemap lists."
+              />
             </div>
           )}
           <FieldError id="url-error">{urlState.error}</FieldError>
