@@ -50,12 +50,19 @@ function visitorId(): string {
   }
 }
 
+/** What the settings page may change without reloading the frame. */
+interface PreviewPatch {
+  config: WidgetConfig;
+  theme: 'light' | 'dark' | null;
+}
+
 export function WidgetChat({
-  theme,
+  theme: initialTheme,
   publicKey,
   parentOrigin,
-  config,
+  config: initialConfig,
   showBranding,
+  livePreview,
 }: {
   /** Set by the settings preview only; null means follow the visitor. */
   theme: 'light' | 'dark' | null;
@@ -63,7 +70,36 @@ export function WidgetChat({
   parentOrigin: string | null;
   config: WidgetConfig;
   showBranding: boolean;
+  /** Only the settings preview may repaint this frame from outside. */
+  livePreview: boolean;
 }) {
+  const [patch, setPatch] = useState<PreviewPatch | null>(null);
+  const config = patch?.config ?? initialConfig;
+  const theme = patch ? patch.theme : initialTheme;
+
+  /**
+   * Appearance arrives by message instead of by reloading the frame.
+   *
+   * Changing the src meant a full navigation on every keystroke: the chat you
+   * were in the middle of disappeared, and the whole widget flashed to say
+   * that one colour had changed. Only what changed repaints now.
+   *
+   * Nothing here affects what the bot answers or who may ask it, and the
+   * listener exists only on the preview, only for our own origin.
+   */
+  useEffect(() => {
+    if (!livePreview) return;
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== window.parent) return;
+      const data = event.data as { type?: string } & PreviewPatch;
+      if (data?.type !== 'docsy:preview') return;
+      setPatch({ config: data.config, theme: data.theme });
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [livePreview]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState('');
   const [busy, setBusy] = useState(false);

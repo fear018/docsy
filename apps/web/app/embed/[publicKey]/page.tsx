@@ -28,6 +28,8 @@ export default async function EmbedPage({
     greeting?: string;
     starters?: string;
     theme?: string;
+    /** Marks the frame as the settings preview, which may repaint it live. */
+    preview?: string;
   }>;
 }) {
   const { publicKey } = await params;
@@ -59,6 +61,7 @@ export default async function EmbedPage({
   // follows the visitor's own system setting, because it is their screen and
   // they have never heard of us.
   const forcedTheme = preview.theme === 'dark' || preview.theme === 'light' ? preview.theme : null;
+  const livePreview = preview.preview === '1';
 
   const config: WidgetConfig = {
     title: preview.title ?? saved.title,
@@ -77,6 +80,7 @@ export default async function EmbedPage({
       parentOrigin={parentOrigin ?? null}
       config={config}
       showBranding={showBranding}
+      livePreview={livePreview}
     />
   );
 }

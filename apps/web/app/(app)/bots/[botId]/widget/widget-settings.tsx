@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 import { widgetConfigSchema } from '@docsy/shared';
 import { saveWidgetConfig, type WidgetState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
@@ -37,30 +37,75 @@ export function WidgetSettings(props: WidgetForm) {
   const [copied, setCopied] = useState(false);
 
   /**
-   * Debounced generously. A starter question is a whole sentence, and
-   * reloading the frame between words is worse than waiting a moment after
-   * the last one.
+   * Loaded once, with the saved values, and never reloaded after that.
+   *
+   * It used to be keyed on the edited values, so every change tore the frame
+   * down and navigated a fresh one — a whole page rebuilt because one colour
+   * moved, and any chat you were testing thrown away with it. Changes are
+   * posted into the running frame instead, which is why this URL must not
+   * depend on them.
    */
-  const [settled, setSettled] = useState({ title, greeting, accent, starters });
-  useEffect(() => {
-    const timer = setTimeout(() => setSettled({ title, greeting, accent, starters }), 1200);
-    return () => clearTimeout(timer);
-  }, [title, greeting, accent, starters]);
-
   const previewUrl = useMemo(() => {
     const url = new URL(`/embed/${props.publicKey}`, props.appUrl);
-    url.searchParams.set('title', settled.title);
-    url.searchParams.set('accent', settled.accent);
-    // The preview matches the app around it. A visitor's widget follows their
-    // own system setting instead.
-    if (appTheme !== 'system') url.searchParams.set('theme', appTheme);
+    url.searchParams.set('preview', '1');
+    url.searchParams.set('title', props.title);
+    url.searchParams.set('accent', props.accent);
     if (props.fullCustomisation) {
-      if (settled.greeting) url.searchParams.set('greeting', settled.greeting);
-      const list = settled.starters.filter(Boolean);
+      if (props.greeting) url.searchParams.set('greeting', props.greeting);
+      const list = props.starters.filter(Boolean);
       if (list.length > 0) url.searchParams.set('starters', list.join('\n'));
     }
     return url.toString();
-  }, [settled, appTheme, props.publicKey, props.appUrl, props.fullCustomisation]);
+  }, [
+    props.publicKey,
+    props.appUrl,
+    props.title,
+    props.accent,
+    props.greeting,
+    props.starters,
+    props.fullCustomisation,
+  ]);
+
+  const frame = useRef<HTMLIFrameElement>(null);
+  const [frameReady, setFrameReady] = useState(false);
+
+  /*
+   * Half-typed colours are not sent. "#3f" is what "#3fd564" looks like on the
+   * way in, and the preview flashing back to the default between keystrokes
+   * would be worse than showing the last colour that made sense.
+   */
+  const lastAccent = useRef(props.accent);
+
+  // No debounce: a postMessage costs nothing, so the preview keeps up with
+  // typing instead of catching up a second later.
+  useEffect(() => {
+    if (!frameReady) return;
+    if (/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(accent)) lastAccent.current = accent;
+    frame.current?.contentWindow?.postMessage(
+      {
+        type: 'docsy:preview',
+        // The preview matches the app around it. A visitor's widget follows
+        // their own system setting instead.
+        theme: appTheme === 'system' ? null : appTheme,
+        config: {
+          title,
+          accent: lastAccent.current,
+          greeting: props.fullCustomisation ? greeting : undefined,
+          starters: props.fullCustomisation ? starters.filter(Boolean) : [],
+        },
+      },
+      new URL(props.appUrl).origin,
+    );
+  }, [
+    frameReady,
+    title,
+    accent,
+    greeting,
+    starters,
+    appTheme,
+    props.appUrl,
+    props.fullCustomisation,
+  ]);
 
   const snippet = `<script src="${props.appUrl}/widget.js" data-bot="${props.publicKey}" data-label="${title.replace(/"/g, '&quot;')}" data-accent="${accent}"${
     position === 'left' ? ' data-position="left"' : ''
@@ -250,8 +295,9 @@ export function WidgetSettings(props: WidgetForm) {
           </p>
           <div className="border-line bg-surface mt-2 overflow-hidden rounded-lg border">
             <iframe
-              key={previewUrl}
+              ref={frame}
               src={previewUrl}
+              onLoad={() => setFrameReady(true)}
               title="Widget preview"
               className="h-96 w-full border-0"
               style={{ colorScheme: 'light dark' }}
