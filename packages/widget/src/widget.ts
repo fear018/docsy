@@ -58,7 +58,7 @@ function build(options: Options) {
     cursor: 'pointer',
     background: options.accent,
     color: '#fff',
-    boxShadow: '0 6px 24px rgba(0,0,0,.22)',
+    boxShadow: '0 4px 14px rgba(0,0,0,.2)',
     display: 'grid',
     placeItems: 'center',
     font: '600 20px/1 system-ui, sans-serif',
@@ -90,7 +90,14 @@ function build(options: Options) {
     borderRadius: '14px',
     overflow: 'hidden',
     background: options.accent,
-    boxShadow: '0 12px 48px rgba(0,0,0,.24)',
+    /*
+     * A hairline plus a soft shadow, not a heavy black blur. The widget lands
+     * on pages we have never seen: over a dark one a large black shadow does
+     * not lift the panel, it smears a grey halo around it. A translucent
+     * neutral border reads on both.
+     */
+    border: '1px solid rgba(128,128,128,.28)',
+    boxShadow: '0 6px 20px rgba(0,0,0,.14)',
     display: 'none',
   } satisfies Styles);
 
