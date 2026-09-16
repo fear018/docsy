@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getEntitlements } from '@/lib/billing/entitlements';
 import { UsageBanner } from '@/components/usage-banner';
 import { AppNav } from './app-nav';
+import { ThemeToggle } from '@/components/theme';
 import { signOut } from '../(auth)/login/actions';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             Docsy
           </Link>
           <AppNav />
-          <form action={signOut} className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
+          </div>
+          <form action={signOut}>
             <button type="submit" className="text-muted hover:text-fg text-sm transition">
               Sign out
             </button>

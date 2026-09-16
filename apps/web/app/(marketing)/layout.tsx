@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { MarketingNav } from './marketing-nav';
+import { ThemeToggle } from '@/components/theme';
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   // Read on the server rather than in the browser: checking after hydration
@@ -17,7 +18,10 @@ export default async function MarketingLayout({ children }: { children: React.Re
           <Link href="/" className="text-sm font-semibold tracking-wide uppercase">
             Docsy
           </Link>
-          <MarketingNav signedIn={Boolean(user)} />
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <MarketingNav signedIn={Boolean(user)} />
+          </div>
         </div>
       </header>
 

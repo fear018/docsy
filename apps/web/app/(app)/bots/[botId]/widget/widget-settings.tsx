@@ -5,6 +5,7 @@ import { widgetConfigSchema } from '@docsy/shared';
 import { saveWidgetConfig, type WidgetState } from './actions';
 import { FieldError, SubmitButton } from '@/components/ui';
 import { Field } from '@/components/field';
+import { useTheme } from '@/components/theme';
 
 export interface WidgetForm {
   botId: string;
@@ -25,6 +26,7 @@ const INPUT =
 
 export function WidgetSettings(props: WidgetForm) {
   const [state, action] = useActionState<WidgetState, FormData>(saveWidgetConfig, {});
+  const [appTheme] = useTheme();
   const [title, setTitle] = useState(props.title);
   const [greeting, setGreeting] = useState(props.greeting);
   const [accent, setAccent] = useState(props.accent);
@@ -49,13 +51,16 @@ export function WidgetSettings(props: WidgetForm) {
     const url = new URL(`/embed/${props.publicKey}`, props.appUrl);
     url.searchParams.set('title', settled.title);
     url.searchParams.set('accent', settled.accent);
+    // The preview matches the app around it. A visitor's widget follows their
+    // own system setting instead.
+    if (appTheme !== 'system') url.searchParams.set('theme', appTheme);
     if (props.fullCustomisation) {
       if (settled.greeting) url.searchParams.set('greeting', settled.greeting);
       const list = settled.starters.filter(Boolean);
       if (list.length > 0) url.searchParams.set('starters', list.join('\n'));
     }
     return url.toString();
-  }, [settled, props.publicKey, props.appUrl, props.fullCustomisation]);
+  }, [settled, appTheme, props.publicKey, props.appUrl, props.fullCustomisation]);
 
   const snippet = `<script src="${props.appUrl}/widget.js" data-bot="${props.publicKey}" data-label="${title.replace(/"/g, '&quot;')}" data-accent="${accent}"${
     position === 'left' ? ' data-position="left"' : ''

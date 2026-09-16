@@ -27,6 +27,7 @@ export default async function EmbedPage({
     accent?: string;
     greeting?: string;
     starters?: string;
+    theme?: string;
   }>;
 }) {
   const { publicKey } = await params;
@@ -54,6 +55,11 @@ export default async function EmbedPage({
    * nothing here changes what the bot answers or who may ask it, and the
    * override affects the one browser that opened the URL.
    */
+  // Only the settings preview sends this. On a customer's site the widget
+  // follows the visitor's own system setting, because it is their screen and
+  // they have never heard of us.
+  const forcedTheme = preview.theme === 'dark' || preview.theme === 'light' ? preview.theme : null;
+
   const config: WidgetConfig = {
     title: preview.title ?? saved.title,
     accent: /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(preview.accent ?? '')
@@ -66,6 +72,7 @@ export default async function EmbedPage({
 
   return (
     <WidgetChat
+      theme={forcedTheme}
       publicKey={publicKey}
       parentOrigin={parentOrigin ?? null}
       config={config}

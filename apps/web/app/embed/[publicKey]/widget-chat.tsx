@@ -27,11 +27,14 @@ function visitorId(): string {
 }
 
 export function WidgetChat({
+  theme,
   publicKey,
   parentOrigin,
   config,
   showBranding,
 }: {
+  /** Set by the settings preview only; null means follow the visitor. */
+  theme: 'light' | 'dark' | null;
   publicKey: string;
   parentOrigin: string | null;
   config: WidgetConfig;
@@ -50,6 +53,11 @@ export function WidgetChat({
     visitor.current = visitorId();
     input.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (theme) document.documentElement.dataset.theme = theme;
+    else delete document.documentElement.dataset.theme;
+  }, [theme]);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });

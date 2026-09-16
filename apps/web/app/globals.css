@@ -1,32 +1,62 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-bg: oklch(100% 0 0);
-  --color-fg: oklch(21% 0.01 260);
-  --color-muted: oklch(52% 0.015 260);
-  --color-line: oklch(92% 0.005 260);
-  --color-surface: oklch(97.5% 0.003 260);
-  --color-brand: oklch(55% 0.17 258);
-  --color-brand-fg: oklch(100% 0 0);
+/*
+ * The palette lives in plain custom properties so three things can set it:
+ * the visitor's system, an explicit choice, and nothing at all. Tailwind reads
+ * them through @theme inline, so utilities follow whichever won.
+ */
+:root {
+  --bg: oklch(100% 0 0);
+  --fg: oklch(21% 0.01 260);
+  --muted: oklch(52% 0.015 260);
+  --line: oklch(92% 0.005 260);
+  --surface: oklch(97.5% 0.003 260);
+  --brand: oklch(55% 0.17 258);
+  --brand-fg: oklch(100% 0 0);
+  color-scheme: light;
+}
+
+/* No choice made: follow the system. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: oklch(17% 0.008 260);
+    --fg: oklch(93% 0.005 260);
+    --muted: oklch(68% 0.012 260);
+    --line: oklch(28% 0.01 260);
+    --surface: oklch(21% 0.009 260);
+    --brand: oklch(70% 0.14 258);
+    --brand-fg: oklch(17% 0.008 260);
+    color-scheme: dark;
+  }
+}
+
+/* A choice was made, and it wins over the system in both directions. */
+:root[data-theme='dark'] {
+  --bg: oklch(17% 0.008 260);
+  --fg: oklch(93% 0.005 260);
+  --muted: oklch(68% 0.012 260);
+  --line: oklch(28% 0.01 260);
+  --surface: oklch(21% 0.009 260);
+  --brand: oklch(70% 0.14 258);
+  --brand-fg: oklch(17% 0.008 260);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-brand: var(--brand);
+  --color-brand-fg: var(--brand-fg);
 }
 
 @layer base {
-  :root {
-    color-scheme: light dark;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    @theme {
-      --color-bg: oklch(17% 0.008 260);
-      --color-fg: oklch(93% 0.005 260);
-      --color-muted: oklch(68% 0.012 260);
-      --color-line: oklch(28% 0.01 260);
-      --color-surface: oklch(21% 0.009 260);
-      --color-brand: oklch(70% 0.14 258);
-      --color-brand-fg: oklch(17% 0.008 260);
-    }
-  }
-
   body {
     background: var(--color-bg);
     color: var(--color-fg);
