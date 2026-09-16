@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { MarketingNav } from './marketing-nav';
-import { ThemeToggle } from '@/components/theme';
+import { SiteHeader } from '@/components/site-header';
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   // Read on the server rather than in the browser: checking after hydration
@@ -13,17 +12,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-dvh">
-      <header className="border-line sticky top-0 z-10 border-b backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3.5">
-          <Link href="/" className="text-sm font-semibold tracking-wide uppercase">
-            Docsy
-          </Link>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <MarketingNav signedIn={Boolean(user)} />
-          </div>
-        </div>
-      </header>
+      <SiteHeader signedIn={Boolean(user)} />
 
       {children}
 

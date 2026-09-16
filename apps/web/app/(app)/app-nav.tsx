@@ -25,7 +25,7 @@ export function AppNav() {
             key={link.href}
             href={link.href}
             aria-current={active ? 'page' : undefined}
-            className={`rounded-lg px-2.5 py-1.5 transition ${
+            className={`rounded-lg px-2.5 py-1.5 whitespace-nowrap transition ${
               active ? 'bg-surface text-fg font-medium' : 'text-muted hover:text-fg'
             }`}
           >
