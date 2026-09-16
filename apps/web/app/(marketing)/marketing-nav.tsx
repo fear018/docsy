@@ -2,9 +2,33 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { AppNav } from '../(app)/app-nav';
+import { signOut } from '../(auth)/login/actions';
 
+/**
+ * Signed out, this is a marketing header: pricing, FAQ, sign in.
+ *
+ * Signed in, it is the app's own header. Someone with an account reading the
+ * landing page or trying the widget is already inside the product, and giving
+ * them a different set of links on every second page is how people lose track
+ * of where they are.
+ */
 export function MarketingNav({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
+
+  if (signedIn) {
+    return (
+      <div className="flex items-center gap-4">
+        <AppNav />
+        <form action={signOut}>
+          <button type="submit" className="text-muted hover:text-fg text-sm transition">
+            Sign out
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   // The anchors only lead anywhere on the landing page itself.
   const onLanding = pathname === '/';
 
@@ -24,19 +48,9 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
           Home
         </Link>
       )}
-
-      {signedIn ? (
-        <Link
-          href="/bots"
-          className="bg-brand text-brand-fg rounded-lg px-3.5 py-1.5 font-medium transition hover:opacity-90"
-        >
-          Open app
-        </Link>
-      ) : (
-        <Link href="/login" className="font-medium">
-          Sign in
-        </Link>
-      )}
+      <Link href="/login" className="font-medium">
+        Sign in
+      </Link>
     </nav>
   );
 }
