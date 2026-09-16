@@ -169,20 +169,23 @@ function build(options: Options) {
 
   launcher.addEventListener('click', () => setOpen(!open));
 
-  addEventListener('message', (event) => {
+  const onMessage = (event: MessageEvent) => {
     if (event.origin !== options.origin) return;
     if ((event.data as { type?: string })?.type === `${NAMESPACE}:close`) {
       setOpen(false);
       launcher.focus();
     }
-  });
+  };
 
-  addEventListener('keydown', (event) => {
+  const onKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && open) {
       setOpen(false);
       launcher.focus();
     }
-  });
+  };
+
+  addEventListener('message', onMessage);
+  addEventListener('keydown', onKeydown);
 
   shell.append(loading, frame);
   document.body.append(shell, launcher);
@@ -191,12 +194,40 @@ function build(options: Options) {
     open: () => setOpen(true),
     close: () => setOpen(false),
     toggle: () => setOpen(!open),
+    /**
+     * Takes everything back down: both elements and both window listeners.
+     *
+     * A page that loads the widget more than once, or unloads it without a
+     * reload, cannot be expected to guess which nodes belong to us — and a
+     * leftover panel with no frame in it is just a coloured rectangle sitting
+     * on the page.
+     */
+    destroy: () => {
+      removeEventListener('message', onMessage);
+      removeEventListener('keydown', onKeydown);
+      phone.removeEventListener('change', applySize);
+      shell.remove();
+      launcher.remove();
+      delete (window as unknown as Record<string, unknown>).Docsy;
+    },
   };
+}
+
+interface WidgetApi {
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
+  destroy: () => void;
 }
 
 function start() {
   const options = readOptions();
   if (!options) return;
+
+  // Loading twice should replace, not stack a second launcher on the first.
+  const existing = (window as unknown as { Docsy?: WidgetApi }).Docsy;
+  existing?.destroy?.();
+
   const api = build(options);
   (window as unknown as Record<string, unknown>).Docsy = api;
 }

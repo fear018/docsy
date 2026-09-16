@@ -11,6 +11,15 @@ import { useEffect, useRef, useState } from 'react';
  * own origin would be handing them the page.
  */
 
+interface WidgetApi {
+  open: () => void;
+  destroy: () => void;
+}
+
+function installed(): WidgetApi | undefined {
+  return (window as unknown as { Docsy?: WidgetApi }).Docsy;
+}
+
 interface Parsed {
   bot: string;
   label?: string;
@@ -52,15 +61,13 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
   const [loaded, setLoaded] = useState<Parsed | null>(null);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
 
-  // Remove the widget on unmount, or the launcher outlives the page.
+  // Leaving this page must take the widget with it. Guessing which nodes are
+  // ours went wrong once already: the panel stayed behind as a coloured
+  // rectangle after the frame was removed. The widget takes itself down.
   useEffect(() => {
     return () => {
+      installed()?.destroy();
       scriptRef.current?.remove();
-      document.querySelectorAll('iframe[title], button[aria-expanded]').forEach((node) => {
-        if (node.getAttribute('src')?.includes('/embed/') || node.getAttribute('aria-expanded')) {
-          node.remove();
-        }
-      });
     };
   }, []);
 
@@ -74,11 +81,8 @@ export function TryWidget({ demoKey }: { demoKey: string | null }) {
     setError(null);
 
     // Replace rather than stack: loading twice would leave two launchers.
+    installed()?.destroy();
     scriptRef.current?.remove();
-    document.querySelectorAll('iframe, button[aria-expanded]').forEach((node) => {
-      const src = node.getAttribute('src') ?? '';
-      if (src.includes('/embed/') || node.getAttribute('aria-expanded') !== null) node.remove();
-    });
 
     const script = document.createElement('script');
     script.src = '/widget.js';
